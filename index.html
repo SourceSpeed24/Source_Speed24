@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Speed | KPI 2024</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Import Map for Modules -->
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.330.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Custom Animations */
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s ease-out forwards;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .animate-wiggle {
+            animation: wiggle 1s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useRef } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { Zap, Menu, X, Instagram, Github, Mail, Trophy, Users, Image as ImageIcon, Hash, Sparkles, MonitorPlay, ChevronLeft, ChevronRight } from 'lucide-react';
+
+        // --- DATA & CONSTANTS ---
+        const CLASS_INFO = {
+            name: "Source Speed",
+            tagline: "Source Speed... Jangan Ribut!!!",
+            university: "UIN Alauddin Makassar",
+            faculty: "Fakultas Dakwah dan Komunikasi",
+            department: "Komunikasi dan Penyiaran Islam",
+            batch: "2024",
+            description: "Kami adalah Source Speed, angkatan 2024 jurusan Komunikasi dan Penyiaran Islam. Rumah bagi kreativitas, solidaritas, dan kecepatan dalam berkarya. Bersatu dalam keberagaman, melaju bersama menuju kesuksesan.",
+            socials: {
+                instagram: "@_sourcespeedkpi.a",
+                tiktok: "@kpi_a24",
+                github: "https://github.com/SourceSpeed24",
+                developer: "agustriananda20@yahoo.com"
+            }
+        };
+
+        const STRUCTURE = {
+            ketua: { id: 1, name: "Bayu Andika Mulawarman", role: "Ketua Tingkat", image: "https://iili.io/flxWTUG.md.png" },
+            wakil: [
+                { id: 2, name: "Muhammad Afgil Pratama S", role: "Wakil Ketua 1", image: "https://iili.io/flxW2UJ.md.jpg" },
+                { id: 3, name: "Muhammad Fadhil Fauzi M", role: "Wakil Ketua 2", image: "https://iili.io/flxWnVt.md.jpg" }
+            ],
+            sekretaris: { id: 4, name: "A. Nur Azizah Putri", role: "Sekretaris", image: "https://iili.io/flxWIls.md.jpg" },
+            bendahara: { id: 5, name: "Nabila Syakieb", role: "Bendahara", image: "https://iili.io/flxWqDN.md.jpg" }
+        };
+
+        const ACHIEVEMENTS = [
+            { id: 1, studentName: "Bayu Andika Mulawarman", title: "Finalis AKSI Indosiar 2025", description: "Indosiar - Akademi Sahur Indonesia 2025" },
+            { id: 2, studentName: "Bayu, Afgil, & Fadhil", title: "Juara 2 MSQ", description: "Porseni Dies Natalis UIN Alauddin Makassar ke-59" },
+            { id: 3, studentName: "Tim Source Speed KPI A", title: "Juara 1 Umum Porsida", description: "Pekan Olahraga Seni dan Dakwah 2025" }
+        ];
+
+        const GALLERY = [
+            { id: 1, url: "https://iili.io/flzuBLl.md.jpg" },
+            { id: 2, url: "https://iili.io/flzuE21.md.jpg" },
+            { id: 3, url: "https://iili.io/flzucBV.md.jpg" },
+            { id: 4, url: "https://iili.io/flzulEB.md.jpg" },
+            { id: 5, url: "https://iili.io/flzu0rP.md.jpg" },
+            { id: 6, url: "https://iili.io/flzuNBp.md.jpg" },
+            { id: 7, url: "https://iili.io/flzuUps.md.jpg" },
+            { id: 8, url: "https://iili.io/flzurTG.md.jpg" },
+            { id: 9, url: "https://iili.io/flzu4jf.md.jpg" },
+            { id: 10, url: "https://iili.io/flzusG2.md.jpg" },
+            { id: 11, url: "https://iili.io/flzuta9.md.jpg" },
+            { id: 12, url: "https://iili.io/flzuDve.md.jpg" },
+            { id: 13, url: "https://iili.io/flzuyjj.md.jpg" },
+            { id: 14, url: "https://iili.io/flzAJCQ.md.jpg" },
+            { id: 15, url: "https://iili.io/flzA26B.md.jpg" }
+        ];
+
+        // --- COMPONENTS ---
+
+        // 1. SpeedyBot Component
+        const SpeedyBot = () => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [messages, setMessages] = useState([
+                { role: 'model', text: "Hai! Aku Speedy ⚡, asisten kelas Source Speed. Pilih perintah di bawah ini!" },
+                { role: 'options', options: [
+                    { label: "Info Kelas", value: "info_kelas" },
+                    { label: "Struktur Kelas", value: "struktur" },
+                    { label: "Prestasi", value: "prestasi" },
+                    { label: "Galeri", value: "galeri" },
+                    { label: "Kontak", value: "kontak" }
+                ]}
+            ]);
+            const messagesEndRef = useRef(null);
+
+            useEffect(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            }, [messages]);
+
+            const handleOptionSelect = (option) => {
+                setMessages(prev => [...prev, { role: 'user', text: option.label }]);
+                
+                let response = "";
+                switch (option.value) {
+                    case "info_kelas":
+                        response = `Source Speed adalah kelas KPI Angkatan 2024 di ${CLASS_INFO.university}, ${CLASS_INFO.faculty}, jurusan ${CLASS_INFO.department}. Tagline: ${CLASS_INFO.tagline}. ${CLASS_INFO.description}`;
+                        break;
+                    case "struktur":
+                        response = `Ketua: ${STRUCTURE.ketua.name} (${STRUCTURE.ketua.role}). Wakil: ${STRUCTURE.wakil.map(w => w.name + ' (' + w.role + ')').join(', ')}. Sekretaris: ${STRUCTURE.sekretaris.name}, Bendahara: ${STRUCTURE.bendahara.name}.`;
+                        break;
+                    case "prestasi":
+                        response = ACHIEVEMENTS.map(a => `${a.title}: ${a.studentName} - ${a.description}`).join('. ');
+                        break;
+                    case "galeri":
+                        response = "Lihat galeri kegiatan di bagian Gallery website ini!";
+                        break;
+                    case "kontak":
+                        response = `Instagram: ${CLASS_INFO.socials.instagram}, TikTok: ${CLASS_INFO.socials.tiktok}, GitHub: ${CLASS_INFO.socials.github}, Email Developer: ${CLASS_INFO.socials.developer}`;
+                        break;
+                    default:
+                        response = "Perintah tidak dikenal. Pilih dari opsi di atas!";
+                }
+                
+                setMessages(prev => [...prev, { role: 'model', text: response }]);
+            };
+
+            return (
+                <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+                    {isOpen && (
+                        <div className="mb-4 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-blue-100 flex flex-col animate-fade-in-up overflow-hidden">
+                            <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 flex justify-between items-center text-white">
+                                <div className="flex items-center gap-2">
+                                    <div className="bg-yellow-400 p-1.5 rounded-full animate-bounce">
+                                        <Zap size={18} className="text-blue-900 fill-current" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-sm">Speedy Bot</h3>
+                                        <p className="text-xs text-blue-100">Online ⚡</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setIsOpen(false)}><X size={20} /></button>
+                            </div>
+                            <div className="h-80 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3">
+                                {messages.map((msg, idx) => (
+                                    <div key={idx}>
+                                        {msg.role === 'options' ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {msg.options.map((option, optIdx) => (
+                                                    <button 
+                                                        key={optIdx} 
+                                                        onClick={() => handleOptionSelect(option)} 
+                                                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-blue-600 text-white self-end rounded-tr-none' : 'bg-white text-gray-800 border border-gray-200 self-start rounded-tl-none shadow-sm'}`}>
+                                                {msg.text}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                <div ref={messagesEndRef} />
+                            </div>
+                            <div className="p-3 bg-white border-t">
+                                <p className="text-xs text-gray-500 text-center">Pilih perintah di atas untuk berinteraksi dengan Speedy!</p>
+                            </div>
+                        </div>
+                    )}
+                    <button onClick={() => setIsOpen(!isOpen)} className="bg-gradient-to-br from-yellow-400 to-yellow-500 text-blue-900 p-4 rounded-full shadow-lg hover:scale-110 transition-transform group relative">
+                        <Zap size={32} className="fill-current animate-wiggle" />
+                        {!isOpen && <span className="absolute right-full mr-4 bg-white px-3 py-1 rounded-lg text-sm font-bold text-blue-900 shadow-sm top-4 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Chat Speedy!</span>}
+                    </button>
+                </div>
+            );
+        };
+
+        // 2. Main App Component
+        const App = () => {
+            const [scrolled, setScrolled] = useState(false);
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 20);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const scrollTo = (id) => {
+                setMobileMenuOpen(false);
+                document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            const openModal = (index) => {
+                setCurrentImageIndex(index);
+                setIsModalOpen(true);
+            };
+
+            const closeModal = () => setIsModalOpen(false);
+
+            const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % GALLERY.length);
+            const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + GALLERY.length) % GALLERY.length);
+
+            return (
+                <div className="min-h-screen text-slate-800">
+                    {/* Navigation */}
+                    <nav className={`fixed top-0 w-full z-40 transition-all duration-300 ${scrolled ? 'glass-nav py-2' : 'bg-transparent py-4'}`}>
+                        <div className="container mx-auto px-6 flex justify-between items-center">
+                            <div className="flex items-center gap-2 font-black text-2xl text-blue-700 tracking-tighter">
+                                <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-8 h-8 rounded" />
+                                SOURCE<span className="text-slate-800">SPEED</span>
+                            </div>
+                            
+                            {/* Desktop Menu */}
+                            <div className="hidden md:flex gap-8 items-center font-medium text-sm text-slate-600">
+                                {['Home', 'Profile', 'Structure', 'Gallery', 'Contact'].map((item) => (
+                                    <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="hover:text-blue-600 transition-colors uppercase tracking-wide">
+                                        {item}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Mobile Toggle */}
+                            <button className="md:hidden text-slate-800" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                                {mobileMenuOpen ? <X /> : <Menu />}
+                            </button>
+                        </div>
+                        
+                        {/* Mobile Menu */}
+                        {mobileMenuOpen && (
+                            <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-lg border-b border-gray-100 p-6 flex flex-col gap-4 shadow-xl">
+                                {['Home', 'Profile', 'Structure', 'Gallery', 'Contact'].map((item) => (
+                                    <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="text-left font-semibold text-slate-700 py-2 border-b border-gray-100 last:border-0">
+                                        {item}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </nav>
+
+                    {/* HERO SECTION */}
+                    <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-b from-blue-50 to-white">
+                        <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-100/50 skew-x-12 transform origin-top-right translate-x-20"></div>
+                        <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+                            <div className="space-y-6 animate-fade-in-up">
+                                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
+                                    <Sparkles size={14} /> KPI Angkatan 2024
+                                </div>
+                                <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 leading-tight">
+                                    Source <span className="text-blue-600">Speed</span><br/>
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-yellow-500 text-4xl md:text-6xl italic">Jangan Ribut!!!</span>
+                                </h1>
+                                <p className="text-lg text-slate-600 max-w-lg leading-relaxed">
+                                    Selamat datang di website resmi kelas Source Speed. Kami bukan sekadar kelas, kami adalah keluarga yang bergerak cepat menuju masa depan.
+                                </p>
+                                <div className="flex gap-4">
+                                    <button onClick={() => scrollTo('profile')} className="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all hover:-translate-y-1">
+                                        Jelajahi Kelas
+                                    </button>
+                                    <button onClick={() => scrollTo('contact')} className="px-8 py-3 rounded-full font-bold text-blue-600 border-2 border-blue-600 hover:bg-blue-50 transition-all">
+                                        Hubungi Kami
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="hidden md:flex justify-center relative">
+                                <div className="relative w-80 h-80 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full rotate-6 animate-float shadow-2xl flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full"></div>
+                                    <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-74 h-74 object-contain drop-shadow-lg" />
+                                </div>
+                                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-75"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* PROFILE SECTION */}
+                    <section id="profile" className="py-20 bg-white">
+                        <div className="container mx-auto px-6">
+                            <div className="text-center max-w-3xl mx-auto mb-16">
+                                <h2 className="text-3xl font-bold text-slate-900 mb-4 flex items-center justify-center gap-2">
+                                    <Hash className="text-blue-600" /> Profil Kelas
+                                </h2>
+                                <p className="text-slate-600">{CLASS_INFO.description}</p>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-3 gap-8">
+                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-shadow group">
+                                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                        <Users size={32} />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">Solidaritas</h3>
+                                    <p className="text-sm text-slate-500">Bersatu membangun kekeluargaan yang erat antar sesama mahasiswa KPI.</p>
+                                </div>
+                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-shadow group">
+                                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                        <MonitorPlay size={32} />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">Kreativitas</h3>
+                                    <p className="text-sm text-slate-500">Mengembangkan bakat di bidang broadcasting, dakwah, dan jurnalistik.</p>
+                                </div>
+                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-shadow group">
+                                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                        <Zap size={32} />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">Kecepatan</h3>
+                                    <p className="text-sm text-slate-500">Sigap dan responsif dalam menghadapi tantangan akademik maupun organisasi.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* STRUCTURE SECTION */}
+                    <section id="structure" className="py-20 bg-slate-50">
+                        <div className="container mx-auto px-6">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900">Struktur Kelas</h2>
+                            <div className="flex flex-col items-center space-y-8">
+                                {/* Ketua Tingkat */}
+                                <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-100">
+                                    <div className="relative overflow-hidden bg-blue-100">
+                                        <img src={STRUCTURE.ketua.image} alt={STRUCTURE.ketua.name} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    </div>
+                                    <div className="p-4">
+                                        <h4 className="font-bold text-slate-900">{STRUCTURE.ketua.name}</h4>
+                                        <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.ketua.role}</p>
+                                    </div>
+                                </div>
+                                
+                                {/* Garis vertikal dari Ketua */}
+                                <div className="w-1 h-8 bg-blue-300"></div>
+                                
+                                {/* Wakil Ketua */}
+                                <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
+                                    {STRUCTURE.wakil.map((wakil) => (
+                                        <div key={wakil.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-70">
+                                            <div className="relative overflow-hidden bg-blue-100">
+                                                <img src={wakil.image} alt={wakil.name} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+                                            </div>
+                                            <div className="p-4">
+                                                <h4 className="font-bold text-slate-900">{wakil.name}</h4>
+                                                <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{wakil.role}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                {/* Garis vertikal dari Wakil */}
+                                <div className="w-1 h-8 bg-blue-300"></div>
+                                
+                                {/* Sekretaris dan Bendahara */}
+                                <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
+                                    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-70">
+                                        <div className="relative overflow-hidden bg-blue-100">
+                                            <img src={STRUCTURE.sekretaris.image} alt={STRUCTURE.sekretaris.name} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        </div>
+                                        <div className="p-4">
+                                            <h4 className="font-bold text-slate-900">{STRUCTURE.sekretaris.name}</h4>
+                                            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.sekretaris.role}</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-70">
+                                        <div className="relative overflow-hidden bg-blue-100">
+                                            <img src={STRUCTURE.bendahara.image} alt={STRUCTURE.bendahara.name} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        </div>
+                                        <div className="p-4">
+                                            <h4 className="font-bold text-slate-900">{STRUCTURE.bendahara.name}</h4>
+                                            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.bendahara.role}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* ACHIEVEMENTS SECTION */}
+                    <section className="py-20 bg-blue-600 text-white relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+                            <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full mix-blend-overlay filter blur-3xl"></div>
+                            <div className="absolute bottom-10 right-10 w-64 h-64 bg-yellow-400 rounded-full mix-blend-overlay filter blur-3xl"></div>
+                        </div>
+                        <div className="container mx-auto px-6 relative z-10">
+                            <h2 className="text-3xl font-bold text-center mb-12 flex items-center justify-center gap-3">
+                                <Trophy className="text-yellow-400" /> Hall of Fame
+                            </h2>
+                            <div className="grid md:grid-cols-3 gap-6">
+                                {ACHIEVEMENTS.map((ach) => (
+                                    <div key={ach.id} className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl hover:bg-white/20 transition-colors">
+                                        <div className="w-10 h-10 bg-yellow-400 text-blue-900 rounded-full flex items-center justify-center mb-4 font-bold">#{ach.id}</div>
+                                        <h3 className="text-xl font-bold mb-1">{ach.title}</h3>
+                                        <p className="text-blue-100 text-sm mb-4">{ach.studentName}</p>
+                                        <p className="text-sm opacity-80">{ach.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* GALLERY SECTION */}
+                    <section id="gallery" className="py-20 bg-white">
+                        <div className="container mx-auto px-6">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 flex items-center justify-center gap-2">
+                                <ImageIcon className="text-blue-600" /> Galeri Kegiatan
+                            </h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                {GALLERY.map((item, idx) => (
+                                    <div key={item.id} className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer" onClick={() => openModal(idx)}>
+                                        <img src={item.url} alt={`Gallery ${item.id}`} className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* CONTACT / FOOTER SECTION */}
+                    <footer id="contact" className="bg-slate-900 text-white pt-20 pb-8">
+                        <div className="container mx-auto px-6">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                                <div className="col-span-2">
+                                    <div className="flex items-center gap-3 font-black text-3xl mb-4">
+                                        <img src="https://iili.io/faDeIcX.png" alt="UINAM Logo" className="w-14 h-14 rounded" />
+                                        <img src="https://iili.io/faDhhdJ.md.png" alt="KPI Logo" className="w-14 h-14 rounded" />
+                                        <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-14 h-14 rounded" />
+                                        SOURCE SPEED
+                                    </div>
+                                    <p className="text-slate-400 leading-relaxed max-w-sm">
+                                        {CLASS_INFO.faculty}<br/>
+                                        {CLASS_INFO.university}<br/>
+                                        Makassar, Indonesia.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-lg mb-6 text-blue-400">Social Media</h4>
+                                    <ul className="space-y-4">
+                                        <li>
+                                            <a href={`https://instagram.com/${CLASS_INFO.socials.instagram.replace('@','')}`} className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
+                                                <Instagram size={20} /> Instagram
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://tiktok.com/@kpi_a24" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
+                                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg> TikTok
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href={CLASS_INFO.socials.github} className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
+                                                <Github size={20} /> GitHub
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-lg mb-6 text-blue-400">Developer</h4>
+                                    <p className="text-slate-400 text-sm mb-4">Developed by Agustriananda</p>
+                                    <a href={`mailto:${CLASS_INFO.socials.developer}`} className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
+                                        <Mail size={20} /> Contact Dev
+                                    </a>
+                                </div>
+                            </div>
+                            <div className="border-t border-slate-800 pt-8 text-center text-slate-500 text-sm">
+                                &copy; 2024 Source Speed KPI A. All rights reserved.
+                            </div>
+                        </div>
+                    </footer>
+                    
+                    {/* Modal Gallery */}
+                    {isModalOpen && (
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeModal}>
+                            <div className="relative max-w-4xl max-h-full p-4" onClick={(e) => e.stopPropagation()}>
+                                <img src={GALLERY[currentImageIndex].url} alt={`Gallery ${currentImageIndex + 1}`} className="max-w-full max-h-full object-contain" />
+                                <button onClick={closeModal} className="absolute top-2 right-2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center">&times;</button>
+                                <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center"><ChevronLeft size={20} /></button>
+                                <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center"><ChevronRight size={20} /></button>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <SpeedyBot />
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
