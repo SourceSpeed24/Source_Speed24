@@ -89,7 +89,7 @@
     <script type="text/babel" data-type="module">
         import React, { useState, useEffect, useRef } from 'react';
         import { createRoot } from 'react-dom/client';
-        import { Zap, Menu, X, Instagram, Github, Mail, Trophy, Users, Image as ImageIcon, Hash, Sparkles, MonitorPlay, ChevronLeft, ChevronRight } from 'lucide-react';
+        import { Zap, Menu, X, Instagram, Github, Mail, Trophy, Users, Image as ImageIcon, Hash, Sparkles, MonitorPlay, ChevronLeft, ChevronRight, Music } from 'lucide-react';
 
         // --- DATA & CONSTANTS ---
         const CLASS_INFO = {
@@ -154,6 +154,36 @@
             { id: 15, url: "image/gallery/15.jpeg" }
         ];
 
+        const PLAYLIST = [
+            { title: "Nina - Feast", src: "playlist/Nina - Feast.mp3" },
+            { title: "Die For You - The Weeknd, Ariana Grande", src: "playlist/Die For You - The Weeknd, Ariana Grande.mp3" },
+            { title: "Bertaut - Nadin Amizah", src: "playlist/Bertaut - Nadin Amizah .mp3" },
+            { title: "Wish You Were Here", src: "playlist/Wish You Were Here.mp3" },
+            { title: "Di Batas Kota Ini", src: "playlist/ Di Batas Kota Ini.mp3" },
+            { title: "WILDFLOWER - BillieEilish", src: "playlist/ WILDFLOWER.mp3" },
+            { title: "A Little Piece of Heaven", src: "playlist/A Little Piece of Heaven.mp3" },
+            { title: "We Maloh", src: "playlist/Amr Diab - We Maloh.mp3" },
+            { title: "Rannu - Ashari Sitaba", src: "playlist/Ashari sitaba - Rannu.mp3" },
+            { title: "blink-182 - ONE MORE TIME", src: "playlist/blink-182 - ONE MORE TIME.mp3" },
+            { title: "Bye (Slowed) - Altere", src: "playlist/Bye (slowed) - Altere.mp3" },
+            { title: "CORTIS - FaSHion", src: "playlist/CORTIS - FaSHioN.mp3" },
+            { title: "ECKO SHOW, JUAN REZA, CHESYLINO - ORANG BARU LEBE GACOR", src: "playlist/ECKO SHOW, JUAN REZA, CHESYLINO - ORANG BARU LEBE GACOR.mp3" },
+            { title: "Jumping Machine", src: "playlist/Jumping Machine.mp3" },
+            { title: "Justin Bieber - Love Yourself", src: "playlist/Justin Bieber - Love Yourself.mp3" },
+            { title: "Kota Ini Tak Sama Tanpamu - Nadhif Basalamah", src: "playlist/Kota Ini Tak Sama Tanpamu - Nadhif Basalamah.mp3" },
+            { title: "Multo - Cup of Joe", src: "playlist/Multo - Cup of Joe.mp3" },
+            { title: "Perunggu - 33x", src: "playlist/Perunggu - 33x.mp3" },
+            { title: "Peterpan - Mungkin Nanti", src: "playlist/Peterpan - Mungkin Nanti.mp3" },
+            { title: "Rewrite The Stars", src: "playlist/Rewrite The Stars.mp3" },
+            { title: "The 1975 - About You", src: "playlist/The 1975 - About You.mp3" },
+            { title: "Wangi Rindu", src: "playlist/Wangi Rindu.mp3" },
+            { title: "You & I - One Direction", src: "playlist/You & I - One Direction.mp3" },
+            { title: "Yura Yunita - Tanda", src: "playlist/Yura Yunita - Tanda.mp3" },
+            { title: "for Revenge - Bandung Hari Ini", src: "playlist/for Revenge - Bandung Hari Ini.mp3" },
+            { title: "for Revenge - Penyangkalan", src: "playlist/for Revenge - Penyangkalan.mp3" },
+            { title: "DJ ENGGAK  DULU (Slowed & Reverb)", src: "playlist/DJ ENGGAK  DULU (Slowed & Reverb).mp3" }
+        ];
+
         // --- COMPONENTS ---
 
         // 1. SpeedyBot Component
@@ -166,6 +196,7 @@
                     { label: "Struktur Kelas", value: "struktur" },
                     { label: "Prestasi", value: "prestasi" },
                     { label: "Galeri", value: "galeri" },
+                    { label: "Playlist Kami", value: "playlist" },
                     { label: "Kontak", value: "kontak" }
                 ]}
             ]);
@@ -191,6 +222,9 @@
                         break;
                     case "galeri":
                         response = "Lihat galeri kegiatan di bagian Gallery website ini!";
+                        break;
+                    case "playlist":
+                        response = "Dengarkan playlist musik kami di Playlist Kami di home page!";
                         break;
                     case "kontak":
                         response = `Instagram: ${CLASS_INFO.socials.instagram}, TikTok: ${CLASS_INFO.socials.tiktok}, GitHub: ${CLASS_INFO.socials.github}, Email Developer: ${CLASS_INFO.socials.developer}`;
@@ -261,6 +295,7 @@
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [currentImageIndex, setCurrentImageIndex] = useState(0);
+            const [isPlaylistOpen, setIsPlaylistOpen] = useState(false);
 
             useEffect(() => {
                 const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -342,6 +377,15 @@
                                     <button onClick={() => scrollTo('contact')} className="px-8 py-3 rounded-full font-bold text-blue-600 border-2 border-blue-600 hover:bg-blue-50 transition-all">
                                         Hubungi Kami
                                     </button>
+                                </div>
+                                <div className="mt-8">
+                                    <div className="glass-card p-6 rounded-2xl text-center hover:shadow-xl transition-shadow group cursor-pointer" onClick={() => setIsPlaylistOpen(true)}>
+                                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                            <Music size={32} />
+                                        </div>
+                                        <h3 className="text-xl font-bold mb-2">Playlist Kami</h3>
+                                        <p className="text-sm text-slate-500">Dengarkan musik favorit kelas Source Speed</p>
+                                    </div>
                                 </div>
                             </div>
                             <div className="hidden md:flex justify-center relative">
@@ -556,6 +600,24 @@
                             </div>
                         </div>
                     )}
+                    
+                    {/* Modal Playlist */}
+                    <div className={isPlaylistOpen ? 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50' : 'hidden'} onClick={() => setIsPlaylistOpen(false)}>
+                        <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-96 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                            <h2 className="text-2xl font-bold mb-4 text-center">Playlist Kami</h2>
+                            <div className="space-y-4">
+                                {PLAYLIST.map((song, idx) => (
+                                    <div key={idx} className="text-center">
+                                        <audio controls className="w-full mb-2">
+                                            <source src={song.src} type="audio/mpeg" />
+                                        </audio>
+                                        <span className="text-sm font-medium">{song.title}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <button onClick={() => setIsPlaylistOpen(false)} className="mt-4 w-full bg-blue-600 text-white py-2 rounded-full">Tutup</button>
+                        </div>
+                    </div>
                     
                     <SpeedyBot />
                 </div>
