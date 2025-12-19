@@ -78,9 +78,97 @@
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+        /* Slider Styles */
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+
+        /* Section Transition Animations */
+        .section-enter {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .section-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-slide-in-left {
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .section-slide-in-left-active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .section-slide-in-right {
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .section-slide-in-right-active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .section-scale-in {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .section-scale-in-active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Stagger animation for child elements */
+        .stagger-children > * {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: staggerFadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-children > *:nth-child(2) { animation-delay: 0.25s; }
+        .stagger-children > *:nth-child(3) { animation-delay: 0.4s; }
+        .stagger-children > *:nth-child(4) { animation-delay: 0.55s; }
+        .stagger-children > *:nth-child(5) { animation-delay: 0.7s; }
+        .stagger-children > *:nth-child(6) { animation-delay: 0.85s; }
+
+        @keyframes staggerFadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -181,7 +269,9 @@
             { title: "Yura Yunita - Tanda", src: "playlist/Yura Yunita - Tanda.mp3" },
             { title: "for Revenge - Bandung Hari Ini", src: "playlist/for Revenge - Bandung Hari Ini.mp3" },
             { title: "for Revenge - Penyangkalan", src: "playlist/for Revenge - Penyangkalan.mp3" },
-            { title: "DJ ENGGAK  DULU (Slowed & Reverb)", src: "playlist/DJ ENGGAK  DULU (Slowed & Reverb).mp3" }
+            { title: "Maher Zain & Harris J - Qalbi Fil Madinah", src: "playlist/Maher Zain & Harris J - Qalbi Fil Madinah.mp3" },
+            { title: "DJ ENGGAK  DULU (Slowed & Reverb)", src: "playlist/DJ ENGGAK  DULU (Slowed & Reverb).mp3" },
+            { title: "Maher Zain - Nas Teshbehlena", src: "playlist/Maher Zain - Nas Teshbehlena  Official Lyric Video.mp3" }
         ];
 
         // --- COMPONENTS ---
@@ -224,7 +314,7 @@
                         response = "Lihat galeri kegiatan di bagian Gallery website ini!";
                         break;
                     case "playlist":
-                        response = "Dengarkan playlist musik kami di Playlist Kami di home page!";
+                        response = "Gunakan pemutar musik di homepage untuk mendengarkan playlist kami!";
                         break;
                     case "kontak":
                         response = `Instagram: ${CLASS_INFO.socials.instagram}, TikTok: ${CLASS_INFO.socials.tiktok}, GitHub: ${CLASS_INFO.socials.github}, Email Developer: ${CLASS_INFO.socials.developer}`;
@@ -289,13 +379,275 @@
             );
         };
 
-        // 2. Main App Component
+        // 2. Music Player Component
+        const MusicPlayer = () => {
+            const [currentSongIndex, setCurrentSongIndex] = useState(0);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [currentTime, setCurrentTime] = useState(0);
+            const [duration, setDuration] = useState(0);
+            const [volume, setVolume] = useState(0.7);
+            const [repeatMode, setRepeatMode] = useState('sequential'); // 'repeat-one', 'sequential', 'shuffle'
+            const [shuffledIndices, setShuffledIndices] = useState([]);
+            const audioRef = useRef(null);
+
+            // Initialize shuffled indices
+            useEffect(() => {
+                const indices = Array.from({ length: PLAYLIST.length }, (_, i) => i);
+                setShuffledIndices(shuffleArray(indices));
+            }, []);
+
+            const shuffleArray = (array) => {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            };
+
+            const currentSong = PLAYLIST[currentSongIndex];
+
+            const play = () => {
+                if (audioRef.current) {
+                    audioRef.current.play();
+                    setIsPlaying(true);
+                }
+            };
+
+            const pause = () => {
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    setIsPlaying(false);
+                }
+            };
+
+            const togglePlayPause = () => {
+                if (isPlaying) {
+                    pause();
+                } else {
+                    play();
+                }
+            };
+
+            const nextSong = () => {
+                let nextIndex;
+                if (repeatMode === 'shuffle') {
+                    const currentShuffleIndex = shuffledIndices.indexOf(currentSongIndex);
+                    nextIndex = shuffledIndices[(currentShuffleIndex + 1) % shuffledIndices.length];
+                } else {
+                    nextIndex = (currentSongIndex + 1) % PLAYLIST.length;
+                }
+                setCurrentSongIndex(nextIndex);
+                setCurrentTime(0);
+                
+                // Auto-play next song
+                setTimeout(() => {
+                    if (audioRef.current) {
+                        audioRef.current.play().then(() => {
+                            setIsPlaying(true);
+                        }).catch((error) => {
+                            console.log('Auto-play failed:', error);
+                            setIsPlaying(false);
+                        });
+                    }
+                }, 50);
+            };
+
+            const prevSong = () => {
+                let prevIndex;
+                if (repeatMode === 'shuffle') {
+                    const currentShuffleIndex = shuffledIndices.indexOf(currentSongIndex);
+                    prevIndex = shuffledIndices[currentShuffleIndex === 0 ? shuffledIndices.length - 1 : currentShuffleIndex - 1];
+                } else {
+                    prevIndex = currentSongIndex === 0 ? PLAYLIST.length - 1 : currentSongIndex - 1;
+                }
+                setCurrentSongIndex(prevIndex);
+                setCurrentTime(0);
+            };
+
+            const handleTimeUpdate = () => {
+                if (audioRef.current) {
+                    setCurrentTime(audioRef.current.currentTime);
+                    setDuration(audioRef.current.duration);
+                }
+            };
+
+            const handleSeek = (e) => {
+                const newTime = (e.target.value / 100) * duration;
+                if (audioRef.current) {
+                    audioRef.current.currentTime = newTime;
+                    setCurrentTime(newTime);
+                }
+            };
+
+            const handleVolumeChange = (e) => {
+                const newVolume = e.target.value / 100;
+                setVolume(newVolume);
+                if (audioRef.current) {
+                    audioRef.current.volume = newVolume;
+                }
+            };
+
+            const toggleRepeatMode = () => {
+                const modes = ['sequential', 'repeat-one', 'shuffle'];
+                const currentIndex = modes.indexOf(repeatMode);
+                const nextMode = modes[(currentIndex + 1) % modes.length];
+                setRepeatMode(nextMode);
+                if (nextMode === 'shuffle') {
+                    const indices = Array.from({ length: PLAYLIST.length }, (_, i) => i);
+                    setShuffledIndices(shuffleArray(indices));
+                }
+            };
+
+            const handleSongEnd = () => {
+                if (repeatMode === 'repeat-one') {
+                    if (audioRef.current) {
+                        audioRef.current.currentTime = 0;
+                        audioRef.current.play();
+                    }
+                } else {
+                    // For sequential and shuffle, keep playing state and go to next song
+                    nextSong();
+                }
+            };
+
+            const formatTime = (time) => {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60);
+                return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            };
+
+            const downloadCurrentSong = () => {
+                const link = document.createElement('a');
+                link.href = currentSong.src;
+                link.download = `${currentSong.title}.mp3`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            return (
+                <div className="glass-card p-6 rounded-2xl hover:shadow-xl transition-shadow">
+                    <div className="text-center mb-4">
+                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                            🎵
+                        </div>
+                        <h3 className="text-xl font-bold mb-1">Playlist Kami</h3>
+                        <p className="text-sm text-slate-500">Musik favorit kelas Source Speed</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        {/* Current Song Info */}
+                        <div className="text-center">
+                            <h4 className="font-semibold text-lg truncate">{currentSong.title}</h4>
+                            <p className="text-sm text-slate-500">Lagu {currentSongIndex + 1} dari {PLAYLIST.length}</p>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="space-y-2">
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={duration ? (currentTime / duration) * 100 : 0}
+                                onChange={handleSeek}
+                                className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer slider"
+                            />
+                            <div className="flex justify-between text-xs text-slate-500">
+                                <span>{formatTime(currentTime)}</span>
+                                <span>{formatTime(duration)}</span>
+                            </div>
+                        </div>
+
+                        {/* Controls */}
+                        <div className="flex items-center justify-center gap-4">
+                            <button onClick={prevSong} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/>
+                                </svg>
+                            </button>
+
+                            <button onClick={togglePlayPause} className="p-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                                {isPlaying ? (
+                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"/>
+                                    </svg>
+                                ) : (
+                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"/>
+                                    </svg>
+                                )}
+                            </button>
+
+                            <button onClick={nextSong} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Volume and Repeat Controls */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.816L4.414 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.414l3.969-3.816a1 1 0 011.234 0zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd"/>
+                                </svg>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={volume * 100}
+                                    onChange={handleVolumeChange}
+                                    className="w-20 h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer slider"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <button onClick={toggleRepeatMode} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                    {repeatMode === 'sequential' && <span className="text-lg">🔄</span>}
+                                    {repeatMode === 'repeat-one' && <span className="text-lg">🔂</span>}
+                                    {repeatMode === 'shuffle' && <span className="text-lg">🔀</span>}
+                                </button>
+                                <button onClick={downloadCurrentSong} className="p-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Hidden Audio Element */}
+                    <audio
+                        ref={audioRef}
+                        src={currentSong.src}
+                        onTimeUpdate={handleTimeUpdate}
+                        onLoadedMetadata={() => setDuration(audioRef.current.duration)}
+                        onEnded={handleSongEnd}
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                        volume={volume}
+                    />
+                </div>
+            );
+        };
+
+        // 3. Main App Component
         const App = () => {
             const [scrolled, setScrolled] = useState(false);
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [currentImageIndex, setCurrentImageIndex] = useState(0);
-            const [isPlaylistOpen, setIsPlaylistOpen] = useState(false);
+            const [activeSection, setActiveSection] = useState('home');
+            const [sectionAnimations, setSectionAnimations] = useState({
+                home: false,
+                profile: false,
+                structure: false,
+                gallery: false,
+                contact: false
+            });
+            const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+            const [isGalleryAutoPlaying, setIsGalleryAutoPlaying] = useState(true);
 
             useEffect(() => {
                 const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -303,9 +655,54 @@
                 return () => window.removeEventListener('scroll', handleScroll);
             }, []);
 
+            // Intersection Observer for section animations
+            useEffect(() => {
+                const observerOptions = {
+                    threshold: 0.3,
+                    rootMargin: '-50px 0px -50px 0px'
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            const sectionId = entry.target.id;
+                            setActiveSection(sectionId);
+                            setSectionAnimations(prev => ({
+                                ...prev,
+                                [sectionId]: true
+                            }));
+                        }
+                    });
+                }, observerOptions);
+
+                // Observe all sections
+                const sections = ['home', 'profile', 'structure', 'gallery', 'contact'];
+                sections.forEach(section => {
+                    const element = document.getElementById(section);
+                    if (element) observer.observe(element);
+                });
+
+                return () => observer.disconnect();
+            }, []);
+
+            // Auto-slide gallery
+            useEffect(() => {
+                if (!isGalleryAutoPlaying) return;
+
+                const interval = setInterval(() => {
+                    setCurrentGalleryIndex((prev) => (prev + 1) % GALLERY.length);
+                }, 5000); // 5 seconds
+
+                return () => clearInterval(interval);
+            }, [isGalleryAutoPlaying]);
+
             const scrollTo = (id) => {
                 setMobileMenuOpen(false);
-                document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById(id)?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                    inline: 'nearest'
+                });
             };
 
             const openModal = (index) => {
@@ -314,6 +711,45 @@
             };
 
             const closeModal = () => setIsModalOpen(false);
+
+            const nextGallery = () => {
+                setCurrentGalleryIndex((prev) => (prev + 1) % GALLERY.length);
+                setIsGalleryAutoPlaying(false); // Pause auto-play when manually controlled
+                setTimeout(() => setIsGalleryAutoPlaying(true), 10000); // Resume after 10 seconds
+            };
+
+            const prevGallery = () => {
+                setCurrentGalleryIndex((prev) => (prev - 1 + GALLERY.length) % GALLERY.length);
+                setIsGalleryAutoPlaying(false);
+                setTimeout(() => setIsGalleryAutoPlaying(true), 10000);
+            };
+
+            const [touchStart, setTouchStart] = useState(null);
+            const [touchEnd, setTouchEnd] = useState(null);
+
+            // Minimum swipe distance (in px)
+            const minSwipeDistance = 50;
+
+            const onTouchStart = (e) => {
+                setTouchEnd(null);
+                setTouchStart(e.targetTouches[0].clientX);
+            };
+
+            const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+            const onTouchEnd = () => {
+                if (!touchStart || !touchEnd) return;
+                const distance = touchStart - touchEnd;
+                const isLeftSwipe = distance > minSwipeDistance;
+                const isRightSwipe = distance < -minSwipeDistance;
+
+                if (isLeftSwipe) {
+                    nextGallery();
+                }
+                if (isRightSwipe) {
+                    prevGallery();
+                }
+            };
 
             const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % GALLERY.length);
             const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + GALLERY.length) % GALLERY.length);
@@ -331,8 +767,19 @@
                             {/* Desktop Menu */}
                             <div className="hidden md:flex gap-8 items-center font-medium text-sm text-slate-600">
                                 {['Home', 'Profile', 'Structure', 'Gallery', 'Contact'].map((item) => (
-                                    <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="hover:text-blue-600 transition-colors uppercase tracking-wide">
+                                    <button
+                                        key={item}
+                                        onClick={() => scrollTo(item.toLowerCase())}
+                                        className={`hover:text-blue-600 transition-all duration-300 uppercase tracking-wide relative ${
+                                            activeSection === item.toLowerCase()
+                                                ? 'text-blue-600 font-semibold'
+                                                : 'text-slate-600'
+                                        }`}
+                                    >
                                         {item}
+                                        {activeSection === item.toLowerCase() && (
+                                            <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-pulse"></div>
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -347,7 +794,15 @@
                         {mobileMenuOpen && (
                             <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-lg border-b border-gray-100 p-6 flex flex-col gap-4 shadow-xl">
                                 {['Home', 'Profile', 'Structure', 'Gallery', 'Contact'].map((item) => (
-                                    <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="text-left font-semibold text-slate-700 py-2 border-b border-gray-100 last:border-0">
+                                    <button
+                                        key={item}
+                                        onClick={() => scrollTo(item.toLowerCase())}
+                                        className={`text-left font-semibold py-2 border-b border-gray-100 last:border-0 transition-all duration-300 ${
+                                            activeSection === item.toLowerCase()
+                                                ? 'text-blue-600 bg-blue-50'
+                                                : 'text-slate-700'
+                                        }`}
+                                    >
                                         {item}
                                     </button>
                                 ))}
@@ -356,9 +811,9 @@
                     </nav>
 
                     {/* HERO SECTION */}
-                    <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-b from-blue-50 to-white">
+                    <section id="home" className={`relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-b from-blue-50 to-white transition-all duration-1000 ${sectionAnimations.home ? 'section-enter-active' : 'section-enter'}`}>
                         <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-100/50 skew-x-12 transform origin-top-right translate-x-20"></div>
-                        <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+                        <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center stagger-children">
                             <div className="space-y-6 animate-fade-in-up">
                                 <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
                                     <Sparkles size={14} /> KPI Angkatan 2024
@@ -379,13 +834,7 @@
                                     </button>
                                 </div>
                                 <div className="mt-8">
-                                    <div className="glass-card p-6 rounded-2xl text-center hover:shadow-xl transition-shadow group cursor-pointer" onClick={() => setIsPlaylistOpen(true)}>
-                                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                            <Music size={32} />
-                                        </div>
-                                        <h3 className="text-xl font-bold mb-2">Playlist Kami</h3>
-                                        <p className="text-sm text-slate-500">Dengarkan musik favorit kelas Source Speed</p>
-                                    </div>
+                                    <MusicPlayer />
                                 </div>
                             </div>
                             <div className="hidden md:flex justify-center relative">
@@ -400,9 +849,9 @@
                     </section>
 
                     {/* PROFILE SECTION */}
-                    <section id="profile" className="py-20 bg-white">
+                    <section id="profile" className={`py-20 bg-white transition-all duration-1000 ${sectionAnimations.profile ? 'section-slide-in-left-active' : 'section-slide-in-left'}`}>
                         <div className="container mx-auto px-6">
-                            <div className="text-center max-w-3xl mx-auto mb-16">
+                            <div className="text-center max-w-3xl mx-auto mb-16 stagger-children">
                                 <h2 className="text-3xl font-bold text-slate-900 mb-4 flex items-center justify-center gap-2">
                                     <Hash className="text-blue-600" /> Profil Kelas
                                 </h2>
@@ -436,10 +885,10 @@
                     </section>
 
                     {/* STRUCTURE SECTION */}
-                    <section id="structure" className="py-20 bg-slate-50">
+                    <section id="structure" className={`py-20 bg-slate-50 transition-all duration-1000 ${sectionAnimations.structure ? 'section-scale-in-active' : 'section-scale-in'}`}>
                         <div className="container mx-auto px-6">
                             <h2 className="text-3xl font-bold text-center mb-12 text-slate-900">Struktur Kelas</h2>
-                            <div className="flex flex-col items-center space-y-8">
+                            <div className="flex flex-col items-center space-y-8 stagger-children">
                                 {/* Ketua Tingkat */}
                                 <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-64">
                                     <div className="relative overflow-hidden bg-blue-100 h-56">
@@ -521,27 +970,95 @@
                     </section>
 
                     {/* GALLERY SECTION */}
-                    <section id="gallery" className="py-20 bg-white">
+                    <section id="gallery" className={`py-20 bg-white transition-all duration-1000 ${sectionAnimations.gallery ? 'section-slide-in-right-active' : 'section-slide-in-right'}`}>
                         <div className="container mx-auto px-6">
-                            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 flex items-center justify-center gap-2">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 flex items-center justify-center gap-2 stagger-children">
                                 <ImageIcon className="text-blue-600" /> Galeri Kegiatan
                             </h2>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-                                {GALLERY.map((item, idx) => (
-                                    <div key={item.id} className="group relative overflow-hidden rounded-md shadow-sm cursor-pointer" onClick={() => openModal(idx)}>
-                                        <div className="w-full aspect-square overflow-hidden">
-                                            <img src={item.url} alt={`Gallery ${item.id}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+
+                            {/* Gallery Carousel */}
+                            <div className="max-w-4xl mx-auto">
+                                <div className="relative overflow-hidden rounded-2xl shadow-2xl bg-black">
+                                    {/* Main Image */}
+                                    <div
+                                        className="relative aspect-video cursor-pointer"
+                                        onTouchStart={onTouchStart}
+                                        onTouchMove={onTouchMove}
+                                        onTouchEnd={onTouchEnd}
+                                        onClick={() => openModal(currentGalleryIndex)}
+                                    >
+                                        <img
+                                            src={GALLERY[currentGalleryIndex].url}
+                                            alt={GALLERY[currentGalleryIndex].caption}
+                                            className="w-full h-full object-cover transition-all duration-700"
+                                            onClick={() => openModal(currentGalleryIndex)}
+                                        />
+
+                                        {/* Overlay with caption */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end">
+                                            <div className="p-6 text-white">
+                                                <h3 className="text-xl font-bold mb-2">{GALLERY[currentGalleryIndex].caption}</h3>
+                                                <p className="text-sm opacity-90">Foto {currentGalleryIndex + 1} dari {GALLERY.length}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Navigation Arrows */}
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); prevGallery(); }}
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); nextGallery(); }}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+
+                                        {/* Auto-play indicator */}
+                                        <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${isGalleryAutoPlaying ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
+                                            {isGalleryAutoPlaying ? 'Auto' : 'Manual'}
                                         </div>
                                     </div>
-                                ))}
+
+                                    {/* Thumbnail indicators */}
+                                    <div className="bg-gray-900 p-4">
+                                        <div className="flex justify-center gap-2 overflow-x-auto">
+                                            {GALLERY.map((item, idx) => (
+                                                <button
+                                                    key={item.id}
+                                                    onClick={() => goToGallery(idx)}
+                                                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                                                        idx === currentGalleryIndex
+                                                            ? 'border-blue-400 shadow-lg shadow-blue-400/50'
+                                                            : 'border-gray-600 hover:border-gray-400'
+                                                    }`}
+                                                >
+                                                    <img
+                                                        src={item.url}
+                                                        alt={`Thumbnail ${item.id}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </section>
 
                     {/* CONTACT / FOOTER SECTION */}
-                    <footer id="contact" className="bg-slate-900 text-white pt-20 pb-8">
+                    <footer id="contact" className={`bg-slate-900 text-white pt-20 pb-8 transition-all duration-1000 ${sectionAnimations.contact ? 'section-enter-active' : 'section-enter'}`}>
                         <div className="container mx-auto px-6">
-                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 stagger-children">
                                 <div className="col-span-2">
                                     <div className="flex items-center gap-3 font-black text-3xl mb-4">
                                         <img src="image/logo/logo-uinam.png" alt="UINAM Logo" className="w-14 h-14 rounded" />
@@ -577,7 +1094,7 @@
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-lg mb-6 text-blue-400">Developer</h4>
-                                    <p className="text-slate-400 text-sm mb-4">Developed by @agstriananda</p>
+                                    <p className="text-slate-400 text-sm mb-4">Developed by <a href="https://instagram.com/agstriananda" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">@agstriananda</a></p>
                                     <a href={`mailto:${CLASS_INFO.socials.developer}`} className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
                                         <Mail size={20} /> Contact Dev
                                     </a>
@@ -600,24 +1117,6 @@
                             </div>
                         </div>
                     )}
-                    
-                    {/* Modal Playlist */}
-                    <div className={isPlaylistOpen ? 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50' : 'hidden'} onClick={() => setIsPlaylistOpen(false)}>
-                        <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-96 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                            <h2 className="text-2xl font-bold mb-4 text-center">Playlist Kami</h2>
-                            <div className="space-y-4">
-                                {PLAYLIST.map((song, idx) => (
-                                    <div key={idx} className="text-center">
-                                        <audio controls className="w-full mb-2">
-                                            <source src={song.src} type="audio/mpeg" />
-                                        </audio>
-                                        <span className="text-sm font-medium">{song.title}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <button onClick={() => setIsPlaylistOpen(false)} className="mt-4 w-full bg-blue-600 text-white py-2 rounded-full">Tutup</button>
-                        </div>
-                    </div>
                     
                     <SpeedyBot />
                 </div>
