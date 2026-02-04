@@ -172,7 +172,60 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <!-- Static fallback shown if JavaScript is disabled or an error occurs -->
+        <div id="fallback" class="min-h-screen flex items-center justify-center p-6">
+            <div class="max-w-2xl text-center bg-white p-6 rounded-lg shadow">
+                <h1 class="text-2xl font-bold mb-2">Source Speed No Service</h1>
+                <p class="text-sm text-slate-600 mb-4">JavaScript tidak tersedia atau terjadi error.</p>
+                <p class="text-sm text-slate-700"><strong>Info singkat:</strong> Source Speed — KPI 2024, UIN Alauddin Makassar.</p>
+                <p class="mt-4"><a href="#" id="reloadBtn" class="text-blue-600 underline">Muat ulang halaman</a></p>
+                <pre id="errorBox" class="text-xs mt-3 text-red-600 hidden"></pre>
+            </div>
+        </div>
+    </div>
+
+    <noscript>
+        <div class="min-h-screen flex items-center justify-center p-6 bg-white">
+            <div class="max-w-2xl text-center">
+                <h1 class="text-2xl font-bold">Source Speed</h1>
+                <p class="text-sm">Untuk melihat konten penuh, aktifkan JavaScript di browser Anda.</p>
+            </div>
+        </div>
+    </noscript>
+
+    <script>
+        // Lightweight error reporting to the fallback UI (runs even if main app fails)
+        window.addEventListener('error', function (e) {
+            try {
+                var box = document.getElementById('errorBox');
+                if (box) {
+                    box.textContent = 'Error: ' + (e && e.message) + '\n at ' + (e && e.filename) + ':' + (e && e.lineno);
+                    box.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Fallback error handler failed', err);
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function (e) {
+            try {
+                var box = document.getElementById('errorBox');
+                if (box) {
+                    var reason = (e && e.reason && e.reason.message) || e.reason || 'Unknown';
+                    box.textContent = 'Unhandled Promise Rejection: ' + reason;
+                    box.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Fallback rejection handler failed', err);
+            }
+        });
+
+        document.getElementById('reloadBtn')?.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            location.reload();
+        });
+    </script>
 
     <script type="text/babel" data-type="module">
         import React, { useState, useEffect, useRef } from 'react';
