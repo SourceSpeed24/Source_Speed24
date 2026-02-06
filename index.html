@@ -169,12 +169,171 @@
                 transform: translateY(0);
             }
         }
+
+        /* Enhanced Animations */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5), 0 0 40px rgba(37, 99, 235, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(37, 99, 235, 0.8), 0 0 60px rgba(37, 99, 235, 0.5); }
+        }
+
+        .animate-glow {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .animate-pulse-scale {
+            animation: pulse-scale 2s ease-in-out infinite;
+        }
+
+        @keyframes slide-down {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-slide-down {
+            animation: slide-down 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes float-orbit {
+            0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+        }
+
+        .animate-orbit {
+            animation: float-orbit 20s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .animate-shimmer {
+            animation: shimmer 3s infinite;
+            background: linear-gradient(to right, #f8fafc 0%, #e0f2fe 50%, #f8fafc 100%);
+            background-size: 1000px 100%;
+        }
+
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .animate-bounce-slow {
+            animation: bounce-slow 2s ease-in-out infinite;
+        }
+
+        /* Typewriter effect */
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .animate-typewriter {
+            overflow: hidden;
+            border-right: 3px solid #2563eb;
+            white-space: nowrap;
+            animation: typewriter 3s steps(40, end);
+        }
+
+        /* Particle animation */
+        @keyframes particle-float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) rotate(360deg); opacity: 0; }
+        }
+
+        .particle {
+            position: absolute;
+            animation: particle-float 4s ease-out forwards;
+            pointer-events: none;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Enhanced card hover */
+        .card-hover-lift {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .card-hover-lift:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Cursor-following Snowflake */
+        @keyframes snowflake-fade {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        .snowflake {
+            position: fixed;
+            color: white;
+            opacity: 1;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 10;
+            animation: snowflake-fade 1s ease-out forwards;
+            font-weight: bold;
+        }
+
+        /* Snowflake Animation */
+        @keyframes snowfall {
+            0% { transform: translateY(-10px) translateX(0); opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh) translateX(100px); opacity: 0; }
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 1.5em;
+            opacity: 0.8;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 10;
+            animation: snowfall linear infinite;
+        }
+
+        /* Lightning Flash Animation */
+        @keyframes lightning-flash {
+            0% { opacity: 0; }
+            10% { opacity: 0.3; }
+            15% { opacity: 1; }
+            20% { opacity: 0.2; }
+            25% { opacity: 1; }
+            30% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        .lightning-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            z-index: 50;
+            animation: lightning-flash 0.6s ease-in-out;
+        }
     </style>
 </head>
 <body>
     <div id="root">
-        <!-- Static fallback shown if JavaScript is disabled or an error occurs -->
-        <div id="fallback" class="min-h-screen flex items-center justify-center p-6">
+           <!-- Static fallback shown if JavaScript is disabled or an error occurs.
+               Hidden by default to avoid brief flash; shown only when an error occurs. -->
+           <div id="fallback" style="display:none;" class="min-h-screen flex items-center justify-center p-6">
             <div class="max-w-2xl text-center bg-white p-6 rounded-lg shadow">
                 <h1 class="text-2xl font-bold mb-2">Source Speed No Service</h1>
                 <p class="text-sm text-slate-600 mb-4">JavaScript tidak tersedia atau terjadi error.</p>
@@ -199,9 +358,11 @@
         window.addEventListener('error', function (e) {
             try {
                 var box = document.getElementById('errorBox');
+                var fb = document.getElementById('fallback');
                 if (box) {
                     box.textContent = 'Error: ' + (e && e.message) + '\n at ' + (e && e.filename) + ':' + (e && e.lineno);
                     box.classList.remove('hidden');
+                    if (fb) fb.style.display = 'block';
                 }
             } catch (err) {
                 console.error('Fallback error handler failed', err);
@@ -211,10 +372,12 @@
         window.addEventListener('unhandledrejection', function (e) {
             try {
                 var box = document.getElementById('errorBox');
+                var fb = document.getElementById('fallback');
                 if (box) {
                     var reason = (e && e.reason && e.reason.message) || e.reason || 'Unknown';
                     box.textContent = 'Unhandled Promise Rejection: ' + reason;
                     box.classList.remove('hidden');
+                    if (fb) fb.style.display = 'block';
                 }
             } catch (err) {
                 console.error('Fallback rejection handler failed', err);
@@ -227,10 +390,10 @@
         });
     </script>
 
-    <script type="text/babel" data-type="module">
-        import React, { useState, useEffect, useRef } from 'react';
-        import { createRoot } from 'react-dom/client';
-        import { Zap, Menu, X, Instagram, Github, Mail, Trophy, Users, Image as ImageIcon, Hash, Sparkles, MonitorPlay, ChevronLeft, ChevronRight, Music } from 'lucide-react';
+    <script id="app-jsx" type="text/plain">
+        // Note: this script contains JSX and ES imports. It will be transpiled
+        // and executed by the module bootstrapper below so the browser doesn't
+        // choke on top-level imports or JSX syntax.
 
         // --- DATA & CONSTANTS ---
         const CLASS_INFO = {
@@ -333,7 +496,7 @@
         const SpeedyBot = () => {
             const [isOpen, setIsOpen] = useState(false);
             const [messages, setMessages] = useState([
-                { role: 'model', text: "Hai! Aku Speedy ⚡, asisten kelas Source Speed. Pilih perintah di bawah ini!" },
+                { role: 'model', text: "Hai! Aku Speedy ⚡, asisten kelas Source Speed. Apa yang bisa aku bantu hari ini?" },
                 { role: 'options', options: [
                     { label: "Info Kelas", value: "info_kelas" },
                     { label: "Struktur Kelas", value: "struktur" },
@@ -343,90 +506,186 @@
                     { label: "Kontak", value: "kontak" }
                 ]}
             ]);
+            const [inputText, setInputText] = useState('');
+            const [isTyping, setIsTyping] = useState(false);
             const messagesEndRef = useRef(null);
 
             useEffect(() => {
                 messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
             }, [messages]);
 
+            // Natural Language Processing untuk Speedy Bot
+            const processUserInput = (text) => {
+                const lowerText = text.toLowerCase().trim();
+                
+                // Keywords mapping untuk response yang lebih natural
+                const keywordMap = {
+                    // Info Kelas
+                    'info|tentang|siapa|kelas|source speed|tujuan': 'info_kelas',
+                    'universitas|fakultas|jurusan|kampus': 'info_kelas',
+                    
+                    // Struktur
+                    'ketua|wakil|sekretaris|bendahara|struktur|organisasi': 'struktur',
+                    'siapa ketua|siapa pemimpin|pemimpin kelas': 'struktur',
+                    
+                    // Prestasi
+                    'prestasi|juara|penghargaan|raih|menang|award': 'prestasi',
+                    'pencapaian|achievement|prestasi apa': 'prestasi',
+                    
+                    // Galeri
+                    'galeri|foto|kegiatan|picture|image|lihat foto': 'galeri',
+                    'dokumentasi|foto kegiatan|kegiatan': 'galeri',
+                    
+                    // Playlist
+                    'musik|playlist|lagu|dengarkan|musik apa': 'playlist',
+                    'song|audio|musik favorit': 'playlist',
+                    
+                    // Kontak
+                    'kontak|hubungi|instagram|tiktok|github|social|whatsapp': 'kontak',
+                    'cara hubungi|nomor|email|alamat': 'kontak'
+                };
+
+                // Check keywords
+                for (const [keywords, category] of Object.entries(keywordMap)) {
+                    const keywordList = keywords.split('|');
+                    if (keywordList.some(kw => lowerText.includes(kw))) {
+                        return category;
+                    }
+                }
+
+                // Default response jika tidak cocok keyword
+                return null;
+            };
+
+            const generateResponse = (category) => {
+                const responses = {
+                    info_kelas: `Source Speed adalah kelas KPI Angkatan 2024 di ${CLASS_INFO.university}, ${CLASS_INFO.faculty}, jurusan ${CLASS_INFO.department}.\n\n📌 **Tagline**: ${CLASS_INFO.tagline}\n\n✨ **Tentang Kami**: Rumah bagi kreativitas, solidaritas, dan kecepatan dalam berkarya. Bersatu dalam keberagaman, melaju bersama menuju kesuksesan!\n\nKami adalah kelas yang solid dengan semangat tinggi untuk mengembangkan potensi di bidang komunikasi dan penyiaran islam.`,
+                    
+                    struktur: `Berikut struktur kepemimpinan kelas Source Speed 2024:\n\n👑 **Ketua Tingkat**: ${STRUCTURE.ketua.name}\n\n📌 **Wakil Ketua**:\n• ${STRUCTURE.wakil[0].name}\n• ${STRUCTURE.wakil[1].name}\n\n📝 **Sekretaris**: ${STRUCTURE.sekretaris.name}\n💰 **Bendahara**: ${STRUCTURE.bendahara.name}\n\nMereka siap memimpin kelas dengan penuh tanggung jawab!`,
+                    
+                    prestasi: `🏆 **Wow! Source Speed punya banyak prestasi!**\n\n✅ Beberapa pencapaian terbaru:\n• Bayu Andika Mulawarman → Finalis AKSI Indosiar 2025\n• Tim Source Speed → Juara 1 Umum Porsida 2025\n• Bayu, Afgil & Fadhil → Juara 2 MSQ Porseni UIN\n• Muhammad Afgil Pratama S → Juara 1 Tilawah 2025\n• Dan masih banyak prestasi lainnya!\n\nSetiap anggota kelas memiliki potensi yang luar biasa! 💪`,
+                    
+                    galeri: `📸 **Lihat galeri kegiatan kami!**\n\nKami punya koleksi foto-foto seru dari berbagai kegiatan kelas Source Speed. Scroll ke bagian Gallery untuk melihat momen-momen berharga bersama teman-teman kelas!\n\nFoto-foto menunjukkan solidaritas, kreativitas, dan kebersamaan kita dalam setiap acara! 🎉`,
+                    
+                    playlist: `🎵 **Playlist Musik Favorit Kelas!**\n\nKelas Source Speed punya 29 lagu dalam playlist kami, dari berbagai genre:\n• Lagu pop modern\n• Lagu relaksasi & slowed version\n• Lagu indie favorit\n• Lagu religius\n\nGunakan musik player di homepage untuk mendengarkan playlist kami. Musik adalah bagian dari jiwa kita! 🎧✨`,
+                    
+                    kontak: `📲 **Mari tetap terhubung!**\n\n📷 Instagram: ${CLASS_INFO.socials.instagram}\n🎬 TikTok: ${CLASS_INFO.socials.tiktok}\n💻 GitHub: ${CLASS_INFO.socials.github}\n\n💌 Hubungi Developer:\nAgus (@agstriananda)\nEmail: ${CLASS_INFO.socials.developer}\n\nFollow media sosial kami untuk update terbaru! 🚀`
+                };
+
+                return responses[category] || null;
+            };
+
             const handleOptionSelect = (option) => {
                 setMessages(prev => [...prev, { role: 'user', text: option.label }]);
-                
-                let response = "";
-                switch (option.value) {
-                    case "info_kelas":
-                        response = `Source Speed adalah kelas KPI Angkatan 2024 di ${CLASS_INFO.university}, ${CLASS_INFO.faculty}, jurusan ${CLASS_INFO.department}. Tagline: ${CLASS_INFO.tagline}. ${CLASS_INFO.description}`;
-                        break;
-                    case "struktur":
-                        response = `Ketua: ${STRUCTURE.ketua.name} (${STRUCTURE.ketua.role}). Wakil: ${STRUCTURE.wakil.map(w => w.name + ' (' + w.role + ')').join(', ')}. Sekretaris: ${STRUCTURE.sekretaris.name}, Bendahara: ${STRUCTURE.bendahara.name}.`;
-                        break;
-                    case "prestasi":
-                        response = ACHIEVEMENTS.map(a => `${a.title}: ${a.studentName} - ${a.description}`).join('. ');
-                        break;
-                    case "galeri":
-                        response = "Lihat galeri kegiatan di bagian Gallery website ini!";
-                        break;
-                    case "playlist":
-                        response = "Gunakan pemutar musik di homepage untuk mendengarkan playlist kami!";
-                        break;
-                    case "kontak":
-                        response = `Instagram: ${CLASS_INFO.socials.instagram}, TikTok: ${CLASS_INFO.socials.tiktok}, GitHub: ${CLASS_INFO.socials.github}, Email Developer: ${CLASS_INFO.socials.developer}`;
-                        break;
-                    default:
-                        response = "Perintah tidak dikenal. Pilih dari opsi di atas!";
-                }
-                
-                setMessages(prev => [...prev, { role: 'model', text: response }]);
+                setIsTyping(true);
+
+                // Simulate typing delay
+                setTimeout(() => {
+                    const response = generateResponse(option.value);
+                    setMessages(prev => [...prev, { role: 'model', text: response }]);
+                    setIsTyping(false);
+                }, 800);
+            };
+
+            const handleUserInput = () => {
+                if (!inputText.trim()) return;
+
+                setMessages(prev => [...prev, { role: 'user', text: inputText }]);
+                setInputText('');
+                setIsTyping(true);
+
+                // Process natural language
+                setTimeout(() => {
+                    const category = processUserInput(inputText);
+                    let response;
+
+                    if (category) {
+                        response = generateResponse(category);
+                    } else {
+                        response = `Hmm, pertanyaanmu menarik! 🤔 Tapi aku belum paham maksudnya. Coba pilih salah satu opsi di bawah atau tanya hal lain tentang kelas:\n\n• Info tentang kelas\n• Siapa saja struktur kelas\n• Prestasi apa yang diraih\n• Lihat galeri kegiatan\n• Playlist musik kami\n• Cara menghubungi kami`;
+                    }
+
+                    setMessages(prev => [...prev, { role: 'model', text: response }]);
+                    setIsTyping(false);
+                }, 1000);
             };
 
             return (
-                <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+                <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
                     {isOpen && (
-                        <div className="mb-4 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-blue-100 flex flex-col animate-fade-in-up overflow-hidden">
-                            <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 flex justify-between items-center text-white">
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-yellow-400 p-1.5 rounded-full animate-bounce">
+                        <div className="mb-4 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-blue-200 flex flex-col animate-slide-down overflow-hidden backdrop-blur-sm" style={{background: 'rgba(255, 255, 255, 0.95)'}}>
+                            <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 p-4 flex justify-between items-center text-white relative overflow-hidden">
+                                <div className="absolute inset-0 opacity-20">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full mix-blend-overlay filter blur-xl"></div>
+                                </div>
+                                <div className="flex items-center gap-2 relative z-10">
+                                    <div className="bg-yellow-400 p-1.5 rounded-full animate-pulse-scale">
                                         <Zap size={18} className="text-blue-900 fill-current" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-sm">Speedy Bot</h3>
-                                        <p className="text-xs text-blue-100">Online ⚡</p>
+                                        <h3 className="font-bold text-sm">Speedy Bot ⚡</h3>
+                                        <p className="text-xs text-blue-100">Online • AI Powered</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setIsOpen(false)}><X size={20} /></button>
+                                <button onClick={() => setIsOpen(false)} className="relative z-10 hover:bg-white/20 p-1 rounded transition-colors"><X size={20} /></button>
                             </div>
-                            <div className="h-80 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3">
+                            
+                            <div className="h-80 overflow-y-auto p-4 bg-gradient-to-b from-gray-50 to-blue-50 flex flex-col gap-3">
                                 {messages.map((msg, idx) => (
-                                    <div key={idx}>
+                                    <div key={idx} className="flex flex-col">
                                         {msg.role === 'options' ? (
                                             <div className="flex flex-wrap gap-2">
                                                 {msg.options.map((option, optIdx) => (
                                                     <button 
                                                         key={optIdx} 
                                                         onClick={() => handleOptionSelect(option)} 
-                                                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                                                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 text-sm font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5"
                                                     >
                                                         {option.label}
                                                     </button>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-blue-600 text-white self-end rounded-tr-none' : 'bg-white text-gray-800 border border-gray-200 self-start rounded-tl-none shadow-sm'}`}>
+                                            <div className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user' ? 'bg-blue-600 text-white self-end rounded-tr-none shadow-md' : 'bg-white text-gray-800 border border-blue-200 self-start rounded-tl-none shadow-sm'}`}>
                                                 {msg.text}
                                             </div>
                                         )}
                                     </div>
                                 ))}
+                                {isTyping && (
+                                    <div className="self-start flex gap-2">
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                    </div>
+                                )}
                                 <div ref={messagesEndRef} />
                             </div>
-                            <div className="p-3 bg-white border-t">
-                                <p className="text-xs text-gray-500 text-center">Pilih perintah di atas untuk berinteraksi dengan Speedy!</p>
+
+                            {/* Input field */}
+                            <div className="p-3 bg-white border-t border-blue-100">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={inputText}
+                                        onChange={(e) => setInputText(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleUserInput()}
+                                        placeholder="Tanya apa saja..."
+                                        className="flex-1 px-3 py-2 border border-blue-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    <button 
+                                        onClick={handleUserInput}
+                                        className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        <Zap size={16} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
-                    <button onClick={() => setIsOpen(!isOpen)} className="bg-gradient-to-br from-yellow-400 to-yellow-500 text-blue-900 p-4 rounded-full shadow-lg hover:scale-110 transition-transform group relative">
+                    <button onClick={() => setIsOpen(!isOpen)} className="bg-gradient-to-br from-yellow-400 to-yellow-500 text-blue-900 p-4 rounded-full shadow-lg hover:scale-110 transition-transform group relative hover:shadow-xl hover:shadow-yellow-400/50 animate-glow">
                         <Zap size={32} className="fill-current animate-wiggle" />
-                        {!isOpen && <span className="absolute right-full mr-4 bg-white px-3 py-1 rounded-lg text-sm font-bold text-blue-900 shadow-sm top-4 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Chat Speedy!</span>}
+                        {!isOpen && <span className="absolute right-full mr-4 bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg top-3 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Chat Speedy!</span>}
                     </button>
                 </div>
             );
@@ -582,17 +841,17 @@
             return (
                 <div className="glass-card p-6 rounded-2xl hover:shadow-xl transition-shadow">
                     <div className="text-center mb-4">
-                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 animate-bounce-slow shadow-lg">
                             🎵
                         </div>
-                        <h3 className="text-xl font-bold mb-1">Playlist Kami</h3>
+                        <h3 className="text-2xl font-bold text-slate-900 mb-1">Playlist Kami</h3>
                         <p className="text-sm text-slate-500">Musik favorit kelas Source Speed</p>
                     </div>
 
                     <div className="space-y-4">
                         {/* Current Song Info */}
-                        <div className="text-center">
-                            <h4 className="font-semibold text-lg truncate">{currentSong.title}</h4>
+                        <div className="text-center bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-lg text-slate-900 truncate">{currentSong.title}</h4>
                             <p className="text-sm text-slate-500">Lagu {currentSongIndex + 1} dari {PLAYLIST.length}</p>
                         </div>
 
@@ -604,23 +863,23 @@
                                 max="100"
                                 value={duration ? (currentTime / duration) * 100 : 0}
                                 onChange={handleSeek}
-                                className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer slider"
+                                className="w-full h-2 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-lg appearance-none cursor-pointer slider hover:h-3 transition-all"
                             />
                             <div className="flex justify-between text-xs text-slate-500">
-                                <span>{formatTime(currentTime)}</span>
-                                <span>{formatTime(duration)}</span>
+                                <span className="font-medium">{formatTime(currentTime)}</span>
+                                <span className="font-medium">{formatTime(duration)}</span>
                             </div>
                         </div>
 
                         {/* Controls */}
                         <div className="flex items-center justify-center gap-4">
-                            <button onClick={prevSong} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                            <button onClick={prevSong} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-110 transition-all">
                                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"/>
                                 </svg>
                             </button>
 
-                            <button onClick={togglePlayPause} className="p-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                            <button onClick={togglePlayPause} className="p-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 hover:scale-110 transition-all shadow-lg hover:shadow-xl">
                                 {isPlaying ? (
                                     <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"/>
@@ -632,7 +891,7 @@
                                 )}
                             </button>
 
-                            <button onClick={nextSong} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                            <button onClick={nextSong} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-110 transition-all">
                                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z"/>
                                 </svg>
@@ -640,7 +899,7 @@
                         </div>
 
                         {/* Volume and Repeat Controls */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                             <div className="flex items-center gap-2">
                                 <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.816L4.414 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.414l3.969-3.816a1 1 0 011.234 0zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd"/>
@@ -656,12 +915,12 @@
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <button onClick={toggleRepeatMode} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                <button onClick={toggleRepeatMode} className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-all" title={`Repeat: ${repeatMode}`}>
                                     {repeatMode === 'sequential' && <span className="text-lg">🔄</span>}
                                     {repeatMode === 'repeat-one' && <span className="text-lg">🔂</span>}
                                     {repeatMode === 'shuffle' && <span className="text-lg">🔀</span>}
                                 </button>
-                                <button onClick={downloadCurrentSong} className="p-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors">
+                                <button onClick={downloadCurrentSong} className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-all hover:scale-110" title="Download">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
@@ -701,6 +960,62 @@
             });
             const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
             const [isGalleryAutoPlaying, setIsGalleryAutoPlaying] = useState(true);
+            const [snowflakes, setSnowflakes] = useState([]);
+            const [showLightning, setShowLightning] = useState(false);
+
+            // Cursor-following Snowflake and Lightning Effect
+            useEffect(() => {
+                const handleMouseMove = (e) => {
+                    const newSnowflake = {
+                        id: Math.random(),
+                        x: e.clientX,
+                        y: e.clientY,
+                        size: 0.8 + Math.random() * 0.4,
+                        timestamp: Date.now()
+                    };
+                    setSnowflakes(prev => [...prev, newSnowflake]);
+                };
+
+                const handleTouchMove = (e) => {
+                    if (e.touches && e.touches.length > 0) {
+                        const touch = e.touches[0];
+                        const newSnowflake = {
+                            id: Math.random(),
+                            x: touch.clientX,
+                            y: touch.clientY,
+                            size: 0.8 + Math.random() * 0.4,
+                            timestamp: Date.now()
+                        };
+                        setSnowflakes(prev => [...prev, newSnowflake]);
+                    }
+                };
+
+                // Lightning effect every 15 seconds
+                const lightningInterval = setInterval(() => {
+                    setShowLightning(true);
+                    setTimeout(() => setShowLightning(false), 600);
+                }, 15000);
+
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('touchmove', handleTouchMove);
+
+                return () => {
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('touchmove', handleTouchMove);
+                    clearInterval(lightningInterval);
+                };
+            }, []);
+
+            // Clean up old snowflakes
+            useEffect(() => {
+                const cleanupInterval = setInterval(() => {
+                    setSnowflakes(prev => 
+                        prev.filter(snowflake => Date.now() - snowflake.timestamp < 1000)
+                    );
+                }, 100);
+
+                return () => clearInterval(cleanupInterval);
+            }, []);
 
             useEffect(() => {
                 const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -809,12 +1124,31 @@
 
             return (
                 <div className="min-h-screen text-slate-800">
+                    {/* Snowflakes */}
+                    {snowflakes.map(snowflake => (
+                        <div
+                            key={snowflake.id}
+                            className="snowflake"
+                            style={{
+                                left: `${snowflake.x}px`,
+                                top: `${snowflake.y}px`,
+                                transform: `translate(-50%, -50%) scale(${snowflake.size})`,
+                                fontSize: '1.5rem'
+                            }}
+                        >
+                            ❄️
+                        </div>
+                    ))}
+
+                    {/* Lightning Flash */}
+                    {showLightning && <div className="lightning-effect"></div>}
+
                     {/* Navigation */}
-                    <nav className={`fixed top-0 w-full z-40 transition-all duration-300 ${scrolled ? 'glass-nav py-2' : 'bg-transparent py-4'}`}>
+                    <nav className={`fixed top-0 w-full z-40 transition-all duration-300 ${scrolled ? 'glass-nav py-2 shadow-lg' : 'bg-transparent py-4'}`}>
                         <div className="container mx-auto px-6 flex justify-between items-center">
-                            <div className="flex items-center gap-2 font-black text-2xl text-blue-700 tracking-tighter">
-                                <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-8 h-8 rounded" />
-                                SOURCE<span className="text-slate-800">SPEED</span>
+                            <div className="flex items-center gap-2 font-black text-2xl text-blue-700 tracking-tighter group cursor-pointer">
+                                <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-8 h-8 rounded group-hover:scale-110 transition-transform" />
+                                <span className="bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">SOURCE</span><span className="text-slate-800 group-hover:text-slate-900">SPEED</span>
                             </div>
                             
                             {/* Desktop Menu */}
@@ -823,37 +1157,37 @@
                                     <button
                                         key={item}
                                         onClick={() => scrollTo(item.toLowerCase())}
-                                        className={`hover:text-blue-600 transition-all duration-300 uppercase tracking-wide relative ${
+                                        className={`hover:text-blue-600 transition-all duration-300 uppercase tracking-wide relative font-semibold ${
                                             activeSection === item.toLowerCase()
-                                                ? 'text-blue-600 font-semibold'
+                                                ? 'text-blue-600'
                                                 : 'text-slate-600'
                                         }`}
                                     >
                                         {item}
                                         {activeSection === item.toLowerCase() && (
-                                            <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-pulse"></div>
+                                            <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full animate-pulse"></div>
                                         )}
                                     </button>
                                 ))}
                             </div>
 
                             {/* Mobile Toggle */}
-                            <button className="md:hidden text-slate-800" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                                {mobileMenuOpen ? <X /> : <Menu />}
+                            <button className="md:hidden text-slate-800 hover:text-blue-600 transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                             </button>
                         </div>
                         
                         {/* Mobile Menu */}
                         {mobileMenuOpen && (
-                            <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-lg border-b border-gray-100 p-6 flex flex-col gap-4 shadow-xl">
+                            <div className="md:hidden absolute top-full left-0 w-full bg-gradient-to-b from-white/95 to-white/90 backdrop-blur-xl border-b border-gray-200 p-6 flex flex-col gap-4 shadow-2xl animate-slide-down">
                                 {['Home', 'Profile', 'Structure', 'Gallery', 'Contact'].map((item) => (
                                     <button
                                         key={item}
                                         onClick={() => scrollTo(item.toLowerCase())}
-                                        className={`text-left font-semibold py-2 border-b border-gray-100 last:border-0 transition-all duration-300 ${
+                                        className={`text-left font-semibold py-3 px-4 rounded-lg transition-all duration-300 ${
                                             activeSection === item.toLowerCase()
-                                                ? 'text-blue-600 bg-blue-50'
-                                                : 'text-slate-700'
+                                                ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600'
+                                                : 'text-slate-700 hover:bg-gray-50'
                                         }`}
                                     >
                                         {item}
@@ -864,25 +1198,29 @@
                     </nav>
 
                     {/* HERO SECTION */}
-                    <section id="home" className={`relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-b from-blue-50 to-white transition-all duration-1000 ${sectionAnimations.home ? 'section-enter-active' : 'section-enter'}`}>
-                        <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-100/50 skew-x-12 transform origin-top-right translate-x-20"></div>
+                    <section id="home" className={`relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-b from-blue-50 via-white to-blue-50 transition-all duration-1000 ${sectionAnimations.home ? 'section-enter-active' : 'section-enter'}`}>
+                        {/* Animated background elements */}
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200/30 rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{animation: 'float 8s ease-in-out infinite'}}></div>
+                        <div className="absolute -bottom-20 left-0 w-96 h-96 bg-cyan-200/20 rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{animation: 'float 10s ease-in-out infinite', animationDelay: '2s'}}></div>
+                        <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-blue-300/20 rounded-full mix-blend-multiply filter blur-3xl animate-float" style={{animation: 'float 12s ease-in-out infinite', animationDelay: '4s'}}></div>
+                        
                         <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center stagger-children">
                             <div className="space-y-6 animate-fade-in-up">
-                                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
-                                    <Sparkles size={14} /> KPI Angkatan 2024
+                                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-shadow">
+                                    <Sparkles size={14} className="animate-spin" style={{animationDuration: '3s'}} /> KPI Angkatan 2024
                                 </div>
                                 <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 leading-tight">
-                                    Source <span className="text-blue-600">Speed</span><br/>
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-yellow-500 text-4xl md:text-6xl italic">Jangan Ribut!!!</span>
+                                    Source <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent animate-pulse">Speed</span><br/>
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-500 to-yellow-500 text-4xl md:text-6xl italic font-black">Jangan Ribut!!!</span>
                                 </h1>
                                 <p className="text-lg text-slate-600 max-w-lg leading-relaxed">
                                     Selamat datang di website resmi kelas Source Speed. Kami bukan sekadar kelas, kami adalah keluarga yang bergerak cepat menuju masa depan.
                                 </p>
-                                <div className="flex gap-4">
-                                    <button onClick={() => scrollTo('profile')} className="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all hover:-translate-y-1">
+                                <div className="flex gap-4 flex-wrap">
+                                    <button onClick={() => scrollTo('profile')} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-blue-600/40 hover:shadow-xl hover:shadow-blue-600/60 transition-all hover:-translate-y-1 hover:scale-105">
                                         Jelajahi Kelas
                                     </button>
-                                    <button onClick={() => scrollTo('contact')} className="px-8 py-3 rounded-full font-bold text-blue-600 border-2 border-blue-600 hover:bg-blue-50 transition-all">
+                                    <button onClick={() => scrollTo('contact')} className="px-8 py-3 rounded-full font-bold text-blue-600 border-2 border-blue-600 hover:bg-blue-50 transition-all hover:scale-105 backdrop-blur-sm">
                                         Hubungi Kami
                                     </button>
                                 </div>
@@ -891,46 +1229,56 @@
                                 </div>
                             </div>
                             <div className="hidden md:flex justify-center relative">
+                                {/* Orbiting elements */}
+                                <div className="absolute w-80 h-80 border-2 border-blue-200/30 rounded-full animate-orbit" style={{animationDuration: '20s'}}></div>
+                                <div className="absolute w-96 h-96 border-2 border-cyan-200/20 rounded-full animate-orbit" style={{animationDuration: '25s', animationDirection: 'reverse'}}></div>
+                                
                                 <div className="relative w-80 h-80 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full rotate-6 animate-float shadow-2xl flex items-center justify-center">
-                                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full"></div>
+                                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full animate-pulse"></div>
                                     <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-74 h-74 object-contain drop-shadow-lg" />
                                 </div>
                                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-75"></div>
+                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" style={{animationDelay: '0.5s'}}></div>
                             </div>
                         </div>
                     </section>
 
                     {/* PROFILE SECTION */}
-                    <section id="profile" className={`py-20 bg-white transition-all duration-1000 ${sectionAnimations.profile ? 'section-slide-in-left-active' : 'section-slide-in-left'}`}>
-                        <div className="container mx-auto px-6">
+                    <section id="profile" className={`py-20 bg-gradient-to-b from-white to-blue-50 transition-all duration-1000 ${sectionAnimations.profile ? 'section-slide-in-left-active' : 'section-slide-in-left'}`}>
+                        {/* Decorative background */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/20 rounded-full filter blur-3xl"></div>
+                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-100/20 rounded-full filter blur-3xl"></div>
+                        </div>
+                        
+                        <div className="container mx-auto px-6 relative z-10">
                             <div className="text-center max-w-3xl mx-auto mb-16 stagger-children">
-                                <h2 className="text-3xl font-bold text-slate-900 mb-4 flex items-center justify-center gap-2">
-                                    <Hash className="text-blue-600" /> Profil Kelas
+                                <h2 className="text-4xl font-bold text-slate-900 mb-4 flex items-center justify-center gap-2">
+                                    <Hash className="text-blue-600 animate-bounce-slow" size={32} /> Profil Kelas
                                 </h2>
-                                <p className="text-slate-600" dangerouslySetInnerHTML={{ __html: CLASS_INFO.description }}></p>
+                                <p className="text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: CLASS_INFO.description }}></p>
                             </div>
                             
                             <div className="grid md:grid-cols-3 gap-8">
-                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-shadow group">
-                                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                                        <Users size={32} />
+                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-all duration-300 group card-hover-lift">
+                                    <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-125 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-blue-400/50">
+                                        <Users size={36} />
                                     </div>
-                                    <h3 className="text-xl font-bold mb-2">Solidaritas</h3>
+                                    <h3 className="text-xl font-bold mb-2 text-slate-900">Solidaritas</h3>
                                     <p className="text-sm text-slate-500">Bersatu membangun kekeluargaan yang erat antar sesama mahasiswa KPI.</p>
                                 </div>
-                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-shadow group">
-                                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                                        <MonitorPlay size={32} />
+                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-all duration-300 group card-hover-lift" style={{transitionDelay: '0.1s'}}>
+                                    <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-125 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-blue-400/50">
+                                        <MonitorPlay size={36} />
                                     </div>
-                                    <h3 className="text-xl font-bold mb-2">Kreativitas</h3>
+                                    <h3 className="text-xl font-bold mb-2 text-slate-900">Kreativitas</h3>
                                     <p className="text-sm text-slate-500">Mengembangkan bakat di bidang broadcasting, dakwah, dan jurnalistik.</p>
                                 </div>
-                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-shadow group">
-                                    <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                                        <Zap size={32} />
+                                <div className="glass-card p-8 rounded-2xl text-center hover:shadow-xl transition-all duration-300 group card-hover-lift" style={{transitionDelay: '0.2s'}}>
+                                    <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-125 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-blue-400/50">
+                                        <Zap size={36} />
                                     </div>
-                                    <h3 className="text-xl font-bold mb-2">Kecepatan</h3>
+                                    <h3 className="text-xl font-bold mb-2 text-slate-900">Kecepatan</h3>
                                     <p className="text-sm text-slate-500">Sigap dan responsif dalam menghadapi tantangan akademik maupun organisasi.</p>
                                 </div>
                             </div>
@@ -938,60 +1286,76 @@
                     </section>
 
                     {/* STRUCTURE SECTION */}
-                    <section id="structure" className={`py-20 bg-slate-50 transition-all duration-1000 ${sectionAnimations.structure ? 'section-scale-in-active' : 'section-scale-in'}`}>
-                        <div className="container mx-auto px-6">
-                            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900">Struktur Kelas</h2>
+                    <section id="structure" className={`py-20 bg-gradient-to-b from-blue-50 to-white transition-all duration-1000 relative overflow-hidden ${sectionAnimations.structure ? 'section-scale-in-active' : 'section-scale-in'}`}>
+                        {/* Decorative elements */}
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                            <div className="absolute -top-40 right-0 w-80 h-80 bg-blue-200/30 rounded-full filter blur-3xl"></div>
+                            <div className="absolute -bottom-40 left-1/2 w-80 h-80 bg-cyan-200/30 rounded-full filter blur-3xl"></div>
+                        </div>
+
+                        <div className="container mx-auto px-6 relative z-10">
+                            <h2 className="text-4xl font-bold text-center mb-16 text-slate-900 flex items-center justify-center gap-2">
+                                <Trophy size={32} className="text-yellow-500 animate-bounce-slow" /> Struktur Kelas
+                            </h2>
                             <div className="flex flex-col items-center space-y-8 stagger-children">
                                 {/* Ketua Tingkat */}
-                                <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-64">
-                                    <div className="relative overflow-hidden bg-blue-100 h-56">
-                                        <img src={STRUCTURE.ketua.image} alt={STRUCTURE.ketua.name} className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 text-center group card-hover-lift w-72 border border-blue-100">
+                                    <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100 h-64">
+                                        <img src={STRUCTURE.ketua.image} alt={STRUCTURE.ketua.name} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                     </div>
-                                    <div className="p-4">
-                                        <h4 className="font-bold text-slate-900">{STRUCTURE.ketua.name}</h4>
-                                        <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.ketua.role}</p>
+                                    <div className="p-5">
+                                        <div className="inline-block bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold mb-2">Ketua</div>
+                                        <h4 className="font-bold text-lg text-slate-900 mb-1">{STRUCTURE.ketua.name}</h4>
+                                        <p className="text-sm text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.ketua.role}</p>
                                     </div>
                                 </div>
                                 
-                                {/* Garis vertikal dari Ketua */}
-                                <div className="w-1 h-8 bg-blue-300"></div>
+                                {/* Garis vertikal dengan animasi */}
+                                <div className="w-1 h-12 bg-gradient-to-b from-blue-500 to-blue-300 rounded-full animate-pulse-scale"></div>
                                 
                                 {/* Wakil Ketua */}
                                 <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
-                                    {STRUCTURE.wakil.map((wakil) => (
-                                        <div key={wakil.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-64">
-                                            <div className="relative overflow-hidden bg-blue-100 h-56">
-                                                <img src={wakil.image} alt={wakil.name} className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    {STRUCTURE.wakil.map((wakil, idx) => (
+                                        <div key={wakil.id} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 text-center group card-hover-lift w-72 border border-blue-100" style={{transitionDelay: `${idx * 0.1}s`}}>
+                                            <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100 h-64">
+                                                <img src={wakil.image} alt={wakil.name} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                             </div>
-                                            <div className="p-4">
-                                                <h4 className="font-bold text-slate-900">{wakil.name}</h4>
-                                                <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{wakil.role}</p>
+                                            <div className="p-5">
+                                                <div className="inline-block bg-blue-400 text-white px-3 py-1 rounded-full text-xs font-bold mb-2">✨ Wakil</div>
+                                                <h4 className="font-bold text-lg text-slate-900 mb-1">{wakil.name}</h4>
+                                                <p className="text-sm text-blue-600 font-semibold uppercase tracking-wide">{wakil.role}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                                 
-                                {/* Garis vertikal dari Wakil */}
-                                <div className="w-1 h-8 bg-blue-300"></div>
+                                {/* Garis vertikal dengan animasi */}
+                                <div className="w-1 h-12 bg-gradient-to-b from-blue-500 to-blue-300 rounded-full animate-pulse-scale"></div>
                                 
                                 {/* Sekretaris dan Bendahara */}
                                 <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
-                                    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-64">
-                                        <div className="relative overflow-hidden bg-blue-100 h-56">
-                                            <img src={STRUCTURE.sekretaris.image} alt={STRUCTURE.sekretaris.name} className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 text-center group card-hover-lift w-72 border border-blue-100">
+                                        <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100 h-64">
+                                            <img src={STRUCTURE.sekretaris.image} alt={STRUCTURE.sekretaris.name} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                         </div>
-                                        <div className="p-4">
-                                            <h4 className="font-bold text-slate-900">{STRUCTURE.sekretaris.name}</h4>
-                                            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.sekretaris.role}</p>
+                                        <div className="p-5">
+                                            <div className="inline-block bg-green-400 text-green-900 px-3 py-1 rounded-full text-xs font-bold mb-2">📝 Sekretaris</div>
+                                            <h4 className="font-bold text-lg text-slate-900 mb-1">{STRUCTURE.sekretaris.name}</h4>
+                                            <p className="text-sm text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.sekretaris.role}</p>
                                         </div>
                                     </div>
-                                    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all text-center group w-64">
-                                        <div className="relative overflow-hidden bg-blue-100 h-56">
-                                            <img src={STRUCTURE.bendahara.image} alt={STRUCTURE.bendahara.name} className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 text-center group card-hover-lift w-72 border border-blue-100">
+                                        <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100 h-64">
+                                            <img src={STRUCTURE.bendahara.image} alt={STRUCTURE.bendahara.name} className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                         </div>
-                                        <div className="p-4">
-                                            <h4 className="font-bold text-slate-900">{STRUCTURE.bendahara.name}</h4>
-                                            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.bendahara.role}</p>
+                                        <div className="p-5">
+                                            <div className="inline-block bg-purple-400 text-purple-900 px-3 py-1 rounded-full text-xs font-bold mb-2">💰 Bendahara</div>
+                                            <h4 className="font-bold text-lg text-slate-900 mb-1">{STRUCTURE.bendahara.name}</h4>
+                                            <p className="text-sm text-blue-600 font-semibold uppercase tracking-wide">{STRUCTURE.bendahara.role}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1000,22 +1364,22 @@
                     </section>
 
                     {/* ACHIEVEMENTS SECTION */}
-                    <section className="py-20 bg-blue-600 text-white relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full opacity-10">
-                            <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full mix-blend-overlay filter blur-3xl"></div>
-                            <div className="absolute bottom-10 right-10 w-64 h-64 bg-yellow-400 rounded-full mix-blend-overlay filter blur-3xl"></div>
+                    <section className="py-20 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                            <div className="absolute top-10 left-10 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-float" style={{animation: 'float 8s ease-in-out infinite'}}></div>
+                            <div className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-400 rounded-full mix-blend-overlay filter blur-3xl animate-float" style={{animation: 'float 10s ease-in-out infinite', animationDelay: '2s'}}></div>
                         </div>
                         <div className="container mx-auto px-6 relative z-10">
-                            <h2 className="text-3xl font-bold text-center mb-12 flex items-center justify-center gap-3">
-                                <Trophy className="text-yellow-400" /> Hall of Fame
+                            <h2 className="text-4xl font-bold text-center mb-12 flex items-center justify-center gap-3">
+                                <Trophy className="text-yellow-300 animate-bounce-slow" size={40} /> Hall of Fame
                             </h2>
                             <div className="grid md:grid-cols-3 gap-6">
-                                {ACHIEVEMENTS.map((ach) => (
-                                    <div key={ach.id} className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl hover:bg-white/20 transition-colors">
-                                        <div className="w-10 h-10 bg-yellow-400 text-blue-900 rounded-full flex items-center justify-center mb-4 font-bold">#{ach.id}</div>
-                                        <h3 className="text-xl font-bold mb-1">{ach.title}</h3>
-                                        <p className="text-blue-100 text-sm mb-4">{ach.studentName}</p>
-                                        <p className="text-sm opacity-80">{ach.description}</p>
+                                {ACHIEVEMENTS.map((ach, idx) => (
+                                    <div key={ach.id} className="bg-white/10 backdrop-blur-md border border-white/30 p-6 rounded-2xl hover:bg-white/20 transition-all duration-300 group card-hover-lift hover:border-white/50" style={{transitionDelay: `${idx * 0.05}s`}}>
+                                        <div className="w-12 h-12 bg-gradient-to-r from-yellow-300 to-yellow-400 text-blue-900 rounded-full flex items-center justify-center mb-4 font-bold text-lg group-hover:scale-110 transition-transform">#{ach.id}</div>
+                                        <h3 className="text-xl font-bold mb-2 group-hover:text-yellow-300 transition-colors">{ach.title}</h3>
+                                        <p className="text-blue-100 text-sm mb-4 font-semibold">{ach.studentName}</p>
+                                        <p className="text-sm opacity-90 leading-relaxed">{ach.description}</p>
                                     </div>
                                 ))}
                             </div>
@@ -1023,18 +1387,24 @@
                     </section>
 
                     {/* GALLERY SECTION */}
-                    <section id="gallery" className={`py-20 bg-white transition-all duration-1000 ${sectionAnimations.gallery ? 'section-slide-in-right-active' : 'section-slide-in-right'}`}>
-                        <div className="container mx-auto px-6">
-                            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 flex items-center justify-center gap-2 stagger-children">
-                                <ImageIcon className="text-blue-600" /> Galeri Kegiatan
+                    <section id="gallery" className={`py-20 bg-gradient-to-b from-white to-blue-50 transition-all duration-1000 relative ${sectionAnimations.gallery ? 'section-slide-in-right-active' : 'section-slide-in-right'}`}>
+                        {/* Decorative background */}
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-100/30 rounded-full filter blur-3xl"></div>
+                            <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-100/30 rounded-full filter blur-3xl"></div>
+                        </div>
+
+                        <div className="container mx-auto px-6 relative z-10">
+                            <h2 className="text-4xl font-bold text-center mb-12 text-slate-900 flex items-center justify-center gap-2 stagger-children">
+                                <ImageIcon className="text-blue-600 animate-bounce-slow" size={36} /> Galeri Kegiatan
                             </h2>
 
                             {/* Gallery Carousel */}
                             <div className="max-w-4xl mx-auto">
-                                <div className="relative overflow-hidden rounded-2xl shadow-2xl bg-black">
+                                <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-black">
                                     {/* Main Image */}
                                     <div
-                                        className="relative aspect-video cursor-pointer"
+                                        className="relative aspect-video cursor-pointer group"
                                         onTouchStart={onTouchStart}
                                         onTouchMove={onTouchMove}
                                         onTouchEnd={onTouchEnd}
@@ -1043,22 +1413,22 @@
                                         <img
                                             src={GALLERY[currentGalleryIndex].url}
                                             alt={GALLERY[currentGalleryIndex].caption}
-                                            className="w-full h-full object-cover transition-all duration-700"
+                                            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
                                             onClick={() => openModal(currentGalleryIndex)}
                                         />
 
                                         {/* Overlay with caption */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end">
-                                            <div className="p-6 text-white">
-                                                <h3 className="text-xl font-bold mb-2">{GALLERY[currentGalleryIndex].caption}</h3>
-                                                <p className="text-sm opacity-90">Foto {currentGalleryIndex + 1} dari {GALLERY.length}</p>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <div className="p-6 text-white w-full">
+                                                <h3 className="text-2xl font-bold mb-2">{GALLERY[currentGalleryIndex].caption}</h3>
+                                                <p className="text-sm opacity-90">Foto {currentGalleryIndex + 1} dari {GALLERY.length} • Klik untuk zoom</p>
                                             </div>
                                         </div>
 
                                         {/* Navigation Arrows */}
                                         <button
                                             onClick={(e) => { e.stopPropagation(); prevGallery(); }}
-                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-3 rounded-full transition-all duration-300 hover:scale-125 opacity-0 group-hover:opacity-100"
                                         >
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1067,7 +1437,7 @@
 
                                         <button
                                             onClick={(e) => { e.stopPropagation(); nextGallery(); }}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-3 rounded-full transition-all duration-300 hover:scale-125 opacity-0 group-hover:opacity-100"
                                         >
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1075,7 +1445,7 @@
                                         </button>
 
                                         {/* Auto-play indicator */}
-                                        <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs flex items-center gap-2">
+                                        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs flex items-center gap-2 font-semibold">
                                             <div className={`w-2 h-2 rounded-full ${isGalleryAutoPlaying ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
                                             {isGalleryAutoPlaying ? 'Auto' : 'Manual'}
                                         </div>
@@ -1083,14 +1453,18 @@
 
                                     {/* Thumbnail indicators */}
                                     <div className="bg-gray-900 p-4">
-                                        <div className="flex justify-center gap-2 overflow-x-auto">
+                                        <div className="flex justify-center gap-2 overflow-x-auto pb-2">
                                             {GALLERY.map((item, idx) => (
                                                 <button
                                                     key={item.id}
-                                                    onClick={() => goToGallery(idx)}
-                                                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                                                    onClick={() => {
+                                                        setCurrentGalleryIndex(idx);
+                                                        setIsGalleryAutoPlaying(false);
+                                                        setTimeout(() => setIsGalleryAutoPlaying(true), 10000);
+                                                    }}
+                                                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 hover:scale-110 ${
                                                         idx === currentGalleryIndex
-                                                            ? 'border-blue-400 shadow-lg shadow-blue-400/50'
+                                                            ? 'border-blue-400 shadow-lg shadow-blue-400/50 scale-110'
                                                             : 'border-gray-600 hover:border-gray-400'
                                                     }`}
                                                 >
@@ -1109,64 +1483,84 @@
                     </section>
 
                     {/* CONTACT / FOOTER SECTION */}
-                    <footer id="contact" className={`bg-slate-900 text-white pt-20 pb-8 transition-all duration-1000 ${sectionAnimations.contact ? 'section-enter-active' : 'section-enter'}`}>
-                        <div className="container mx-auto px-6">
+                    <footer id="contact" className={`bg-gradient-to-b from-slate-900 to-slate-950 text-white pt-20 pb-8 transition-all duration-1000 relative overflow-hidden ${sectionAnimations.contact ? 'section-enter-active' : 'section-enter'}`}>
+                        {/* Decorative background */}
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                            <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full filter blur-3xl"></div>
+                            <div className="absolute top-0 left-0 w-80 h-80 bg-blue-600/10 rounded-full filter blur-3xl"></div>
+                        </div>
+
+                        <div className="container mx-auto px-6 relative z-10">
                             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 stagger-children">
                                 <div className="col-span-2">
-                                    <div className="flex items-center gap-3 font-black text-3xl mb-4">
-                                        <img src="image/logo/logo-uinam.png" alt="UINAM Logo" className="w-14 h-14 rounded" />
-                                        <img src="https://iili.io/faDhhdJ.md.png" alt="KPI Logo" className="w-14 h-14 rounded" />
-                                        <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-14 h-14 rounded" />
-                                        SOURCE SPEED
+                                    <div className="flex items-center gap-3 font-black text-3xl mb-4 group">
+                                        <img src="image/logo/logo-uinam.png" alt="UINAM Logo" className="w-14 h-14 rounded group-hover:scale-110 transition-transform" />
+                                        <img src="https://iili.io/faDhhdJ.md.png" alt="KPI Logo" className="w-14 h-14 rounded group-hover:scale-110 transition-transform" />
+                                        <img src="https://iili.io/faDhY5x.md.png" alt="Source Speed Logo" className="w-14 h-14 rounded group-hover:scale-110 transition-transform" />
+                                        <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">SOURCE SPEED</span>
                                     </div>
-                                    <p className="text-slate-400 leading-relaxed max-w-sm">
+                                    <p className="text-slate-400 leading-relaxed max-w-sm hover:text-slate-300 transition-colors">
                                         {CLASS_INFO.faculty}<br/>
                                         {CLASS_INFO.university}<br/>
                                         Makassar, Indonesia.
                                     </p>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg mb-6 text-blue-400">Social Media</h4>
+                                    <h4 className="font-bold text-lg mb-6 text-blue-400 flex items-center gap-2">
+                                        <span className="w-1 h-6 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full"></span>
+                                        Social Media
+                                    </h4>
                                     <ul className="space-y-4">
                                         <li>
-                                            <a href={`https://instagram.com/${CLASS_INFO.socials.instagram.replace('@','')}`} className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                                <Instagram size={20} /> Instagram
+                                            <a href={`https://instagram.com/${CLASS_INFO.socials.instagram.replace('@','')}`} className="flex items-center gap-3 text-slate-300 hover:text-white transition-all duration-300 group">
+                                                <Instagram size={20} className="group-hover:translate-y-1 transition-transform" /> 
+                                                <span className="group-hover:translate-x-1 transition-transform">Instagram</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="https://tiktok.com/@kpi_a24" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg> TikTok
+                                            <a href="https://tiktok.com/@kpi_a24" className="flex items-center gap-3 text-slate-300 hover:text-white transition-all duration-300 group">
+                                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-y-1 transition-transform"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+                                                <span className="group-hover:translate-x-1 transition-transform">TikTok</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href={CLASS_INFO.socials.github} className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                                <Github size={20} /> GitHub
+                                            <a href={CLASS_INFO.socials.github} className="flex items-center gap-3 text-slate-300 hover:text-white transition-all duration-300 group">
+                                                <Github size={20} className="group-hover:translate-y-1 transition-transform" /> 
+                                                <span className="group-hover:translate-x-1 transition-transform">GitHub</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-lg mb-6 text-blue-400">Developer</h4>
-                                    <p className="text-slate-400 text-sm mb-4">Developed by <a href="https://instagram.com/agstriananda" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">@agstriananda</a></p>
-                                    <a href={`mailto:${CLASS_INFO.socials.developer}`} className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                        <Mail size={20} /> Contact Dev
+                                    <h4 className="font-bold text-lg mb-6 text-blue-400 flex items-center gap-2">
+                                        <span className="w-1 h-6 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full"></span>
+                                        Developer
+                                    </h4>
+                                    <p className="text-slate-400 text-sm mb-4 hover:text-slate-300 transition-colors">Developed with 💙 by <a href="https://instagram.com/agstriananda" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors font-semibold">@agstriananda</a></p>
+                                    <a href={`mailto:${CLASS_INFO.socials.developer}`} className="flex items-center gap-3 text-slate-300 hover:text-white transition-all duration-300 group">
+                                        <Mail size={20} className="group-hover:translate-y-1 transition-transform" /> 
+                                        <span className="group-hover:translate-x-1 transition-transform">Contact Dev</span>
                                     </a>
                                 </div>
                             </div>
-                            <div className="border-t border-slate-800 pt-8 text-center text-slate-500 text-sm">
-                                &copy; 2024 Source Speed KPI A. All rights reserved.
+                            <div className="border-t border-slate-800 pt-8 text-center">
+                                <p className="text-slate-500 text-sm">
+                                    &copy; 2024 Source Speed KPI A • Made with <span className="text-red-400 animate-pulse">❤️</span> • All rights reserved
+                                </p>
+                                <p className="text-slate-600 text-xs mt-2">Source Speed... Jangan Ribut!!! ⚡</p>
                             </div>
                         </div>
                     </footer>
                     
                     {/* Modal Gallery */}
                     {isModalOpen && (
-                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeModal}>
+                        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in-up" onClick={closeModal}>
                             <div className="relative max-w-4xl max-h-full p-4" onClick={(e) => e.stopPropagation()}>
-                                <img src={GALLERY[currentImageIndex].url} alt={`Gallery ${currentImageIndex + 1}`} className="max-w-full max-h-full object-contain" />
-                                <button onClick={closeModal} className="absolute top-2 right-2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center">&times;</button>
-                                <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center"><ChevronLeft size={20} /></button>
-                                <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center"><ChevronRight size={20} /></button>
+                                <img src={GALLERY[currentImageIndex].url} alt={`Gallery ${currentImageIndex + 1}`} className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+                                <button onClick={closeModal} className="absolute top-4 right-4 text-white bg-black/60 hover:bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold transition-all hover:scale-110">✕</button>
+                                <button onClick={prevImage} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white bg-black/60 hover:bg-black/80 backdrop-blur-sm p-2 rounded-full transition-all hover:scale-125"><ChevronLeft size={24} /></button>
+                                <button onClick={nextImage} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white bg-black/60 hover:bg-black/80 backdrop-blur-sm p-2 rounded-full transition-all hover:scale-125"><ChevronRight size={24} /></button>
+                                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold">Foto {currentImageIndex + 1} dari {GALLERY.length}</div>
                             </div>
                         </div>
                     )}
@@ -1178,6 +1572,53 @@
 
         const root = createRoot(document.getElementById('root'));
         root.render(<App />);
+    </script>
+
+    <script type="module">
+        // Module bootstrapper:
+        // - reads the JSX script above
+        // - strips top-level import lines
+        // - transpiles JSX to plain JS using Babel standalone
+        // - creates a dynamic module that imports React and lucide icons from ESM CDN
+        // - executes the module so the original app runs unmodified
+        (async function() {
+            try {
+                const raw = document.getElementById('app-jsx').textContent || '';
+
+                // Remove any existing import lines (if author left them)
+                const cleaned = raw.replace(/^\s*import .*$/mg, '');
+
+                // Transpile JSX -> JS (classic runtime)
+                const transformed = Babel.transform(cleaned, {
+                    presets: ['react', 'env'],
+                    sourceType: 'script'
+                }).code;
+
+                // Compose a module that provides React and lucide icons as imports
+                const moduleSource = `
+import React, { useState, useEffect, useRef } from 'https://esm.sh/react@18.2.0';
+import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+import * as lucide from 'https://esm.sh/lucide-react@0.330.0';
+const { Zap, Menu, X, Instagram, Github, Mail, Trophy, Users, Image: ImageIcon, Hash, Sparkles, MonitorPlay, ChevronLeft, ChevronRight, Music } = lucide;
+${transformed}
+`;
+
+                const blob = new Blob([moduleSource], { type: 'text/javascript' });
+                const url = URL.createObjectURL(blob);
+
+                await import(url);
+            } catch (err) {
+                console.error('App bootstrap failed:', err);
+                // Show error in fallback UI if present
+                const box = document.getElementById('errorBox');
+                const fb = document.getElementById('fallback');
+                if (box) {
+                    box.textContent = (err && err.stack) ? err.stack : String(err);
+                    box.classList.remove('hidden');
+                }
+                if (fb) fb.style.display = 'block';
+            }
+        })();
     </script>
 </body>
 </html>
