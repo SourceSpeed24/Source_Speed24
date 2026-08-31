@@ -1588,10 +1588,14 @@
                 // Remove any existing import lines (if author left them)
                 const cleaned = raw.replace(/^\s*import .*$/mg, '');
 
-                // Transpile JSX -> JS (classic runtime)
+                // Transpile JSX -> JS without CommonJS output so it runs in the browser.
+                // The default Babel config was generating `require(...)`, which crashes in a module context.
                 const transformed = Babel.transform(cleaned, {
-                    presets: ['react', 'env'],
-                    sourceType: 'script'
+                    presets: [
+                        ['env', { modules: false }],
+                        ['react', { runtime: 'classic' }]
+                    ],
+                    sourceType: 'module'
                 }).code;
 
                 // Compose a module that provides React and lucide icons as imports
